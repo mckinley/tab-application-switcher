@@ -1,0 +1,10 @@
+{
+  "app_name": {
+    "message": "Tab Application Switcher",
+    "description": "The name of the application"
+  },
+  "app_description": {
+    "message": "Application switcher for Chrome tabs",
+    "description": "The description of the application"
+  }
+}
