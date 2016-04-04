@@ -1,1 +1,1 @@
-# application-switcher
+# tab-application-switcher
