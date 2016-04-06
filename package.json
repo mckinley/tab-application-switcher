@@ -1,0 +1,10 @@
+{
+  "name": "tab-application-switcher",
+  "private": true,
+  "dependencies": {
+    "mocha": "^2.4.5"
+  },
+  "scripts": {
+  	"test": "mocha test"
+  }
+}
