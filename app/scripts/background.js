@@ -31,32 +31,38 @@ console.log('background.js');
     if (request.tabObjects) {
       sendResponse({ tabObjects: tabs });
     } else if (request.selectTab) {
-      chrome.windows.update(request.selectTab.windowId, { focused: true });
-      chrome.tabs.update(request.selectTab.id, { selected: true });
+      selectTab(request.selectTab);
     }
+  }
+
+  function selectTab(tab) {
+    chrome.windows.update(tab.windowId, { focused: true });
+    chrome.tabs.update(tab.id, { selected: true });
   }
 
   chrome.runtime.onMessage.addListener(contentListener);
 
   chrome.tabs.onCreated.addListener(function(tab) {
-    console.log('chrome.tabs.onCreated');
+    tabs.unshift(tab);
   });
 
   chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-    console.log('chrome.tabs.onRemoved');
+    tabs.splice(tabs.indexOf(findTab(tabId)), 1);
   });
 
   chrome.tabs.onActivated.addListener(function(activeInfo) {
-    console.log('chrome.tabs.onActivated');
-    for (var i = 0; i < tabs.length; i++) {
+    sortTabs(findTab(activeInfo.tabId));
+  });
+
+  function findTab(id) {
+    var l = tabs.length;
+    for (var i = 0; i < l; i++) {
       var tab = tabs[i];
-      if (activeInfo.tabId === tab.id) {
-        var activatedTab = tab;
-        break;
+      if (id === tab.id) {
+        return tab;
       }
     }
-    sortTabs(activatedTab);
-  });
+  }
 
   getTabs();
 
