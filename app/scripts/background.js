@@ -4,77 +4,39 @@ console.log('background.js');
 
 (function() {
 
-  var tabIds = [];
+  var tabs = [];
+
+  function sortTabs(tab) {
+    var index = tabs.indexOf(tab);
+    if (index === -1) {
+      tabs.unshift(tab);
+    } else {
+      tabs.unshift(tabs.splice(tabs.indexOf(tab), 1)[0]);
+    }
+  }
+
+  function getTabs() {
+    chrome.tabs.query({}, function(results) {
+      tabs = results;
+      for (var i = 0; i < tabs.length; i++) {
+        var tab = tabs[i];
+        if (tab.lastFocusedWindow) {
+          sortTabs(tab);
+        }
+      }
+    });
+  }
 
   function contentListener(request, sender, sendResponse) {
     if (request.tabObjects) {
-      getOrderedTabs(function(tabs) {
-        sendResponse({ tabObjects: tabs });
-      });
-      return true;
-    } else if (request.selectTabId) {
-      chrome.tabs.update(request.selectTabId, { selected: true });
+      sendResponse({ tabObjects: tabs });
+    } else if (request.selectTab) {
+      chrome.windows.update(request.selectTab.windowId, { focused: true });
+      chrome.tabs.update(request.selectTab.id, { selected: true });
     }
   }
 
   chrome.runtime.onMessage.addListener(contentListener);
-
-  function updateTabIds(tabId) {
-    var index = tabIds.indexOf(tabId);
-    if (index === -1) {
-      tabIds.unshift(tabId);
-    } else {
-      tabIds.unshift(tabIds.splice(tabIds.indexOf(tabId), 1)[0]);
-    }
-  }
-
-  function getOrderedTabs(next) {
-    chrome.tabs.query({}, function(tabs) {
-      var tabsById = {};
-      for (var i = 0; i < tabs.length; i++) {
-        var tab = tabs[i];
-        tabsById[tab.id] = tab;
-      }
-
-      var orderedTabs = [];
-      for (var j = 0; j < tabIds.length; j++) {
-        var tabId = tabIds[j];
-        orderedTabs.push(tabsById[tabId]);
-      }
-
-      next(orderedTabs);
-    });
-  }
-
-  function getTabs() {
-    chrome.tabs.query({}, function(tabs) {
-      for (var i = 0; i < tabs.length; i++) {
-        var tab = tabs[i];
-        if (tabIds.indexOf(tab.id) === -1) {
-          tabIds.push(tab.id);
-        }
-      }
-    });
-  }
-
-  function getWindow(next) {
-    chrome.windows.getCurrent({ populate: true }, function(window) {
-      var tabs = window.tabs;
-      var activeTab;
-      for (var i = 0; i < tabs.length; i++) {
-        var tab = tabs[i];
-        if (tab.active) {
-          activeTab = tab;
-        } else {
-          tabIds.push(tab.id);
-        }
-      }
-      tabIds.unshift(activeTab.id);
-      next();
-    });
-  }
-
-  getWindow(getTabs);
 
   chrome.tabs.onCreated.addListener(function(tab) {
     console.log('chrome.tabs.onCreated');
@@ -86,7 +48,16 @@ console.log('background.js');
 
   chrome.tabs.onActivated.addListener(function(activeInfo) {
     console.log('chrome.tabs.onActivated');
-    updateTabIds(activeInfo.tabId);
+    for (var i = 0; i < tabs.length; i++) {
+      var tab = tabs[i];
+      if (activeInfo.tabId === tab.id) {
+        var activatedTab = tab;
+        break;
+      }
+    }
+    sortTabs(activatedTab);
   });
+
+  getTabs();
 
 })();

@@ -11,20 +11,22 @@
 
   function onKeyDown(e) {
     if (e.metaKey) {
-      if (e.keyIdentifier == 'Alt') {
+      if (e.keyCode === 18) { // Alt
         if (!active) {
           displayTabObjects();
         } else {
           highlightNextTab();
         }
-      } else if (active && e.keyIdentifier == 'Control') {
+      } else if (active && e.keyCode === 17) { // Control
         highlightPreviousTab();
+      } else if (e.keyCode === 27) { // Esc
+        distroyTabObjects();
       }
     }
   }
 
   function onKeyUp(e) {
-    if (active && e.keyIdentifier == 'Meta') {
+    if (active && e.keyCode == 91) { // Meta
       selectHighlightedTab();
       distroyTabObjects();
     }
@@ -72,7 +74,9 @@
       var tabIcon = document.createElement('div');
 
       tabTitle.setAttribute('title', tabObject.url);
-      tabIcon.style.backgroundImage = "url('" + tabObject.favIconUrl + "')";
+      if (tabObject.favIconUrl) {
+        tabIcon.style.backgroundImage = "url('" + tabObject.favIconUrl + "')";
+      }
 
       tabCon.classList.add('TAS_tabCon');
       tabTitle.classList.add('TAS_tabTitle');
@@ -106,7 +110,7 @@
   }
 
   function selectHighlightedTab() {
-    chrome.runtime.sendMessage({ selectTabId: tabObjects[tabObjectsCursor].id });
+    chrome.runtime.sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
   }
 
 })();
