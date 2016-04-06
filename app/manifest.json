@@ -21,20 +21,21 @@
     "tabs"
   ],
   "options_ui": {
-  	"chrome_style": true,
+    "chrome_style": true,
     "page": "options.html"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "scripts/content.js"
-      ]
-    }
-  ],
+  "content_scripts": [{
+    "matches": [
+      "http://*/*",
+      "https://*/*"
+    ],
+    "js": [
+      "scripts/content.js"
+    ],
+    "css": [
+      "styles/main.css"
+    ]
+  }],
   "omnibox": {
     "keyword": "OMNIBOX-KEYWORD"
   },

@@ -9,10 +9,11 @@ console.log('background.js');
   function contentListener(request, sender, sendResponse) {
     if (request.tabObjects) {
       getOrderedTabs(function(tabs) {
-        // reduce the tab objects to minimal info
         sendResponse({ tabObjects: tabs });
       });
       return true;
+    } else if (request.selectTabId) {
+      chrome.tabs.update(request.selectTabId, { selected: true });
     }
   }
 
@@ -69,7 +70,6 @@ console.log('background.js');
         }
       }
       tabIds.unshift(activeTab.id);
-
       next();
     });
   }
