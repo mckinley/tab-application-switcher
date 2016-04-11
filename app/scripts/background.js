@@ -7,12 +7,12 @@ console.log(test);
 console.log('background.js');
 
 (function() {
-  var tabs = [];
+  var tabs;
 
   function getTabs() {
     chrome.windows.getAll({ populate: true }, function(windows) {
+      tabs = [];
       var focused;
-      var activeTab;
       windows.forEach(function(w) {
         if (w.focused) {
           focused = w;
