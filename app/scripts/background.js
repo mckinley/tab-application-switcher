@@ -34,7 +34,7 @@ console.log('background.js');
     var l = tabs.length;
     for (var i = 0; i < l; i++) {
       var tab = tabs[i];
-      if (id === tab.id) {
+      if (tab && tab.id === id) {
         return tab;
       }
     }
