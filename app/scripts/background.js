@@ -10,15 +10,6 @@ console.log('background.js');
 
   var tabs = [];
 
-  function sortTabs(tab) {
-    var index = tabs.indexOf(tab);
-    if (index === -1) {
-      tabs.unshift(tab);
-    } else {
-      tabs.unshift(tabs.splice(tabs.indexOf(tab), 1)[0]);
-    }
-  }
-
   function getTabs() {
     chrome.tabs.query({}, function(results) {
       tabs = results;
@@ -31,6 +22,30 @@ console.log('background.js');
     });
   }
 
+  function sortTabs(tab) {
+    var index = tabs.indexOf(tab);
+    if (index === -1) {
+      tabs.unshift(tab);
+    } else {
+      tabs.unshift(tabs.splice(tabs.indexOf(tab), 1)[0]);
+    }
+  }
+
+  function findTab(id) {
+    var l = tabs.length;
+    for (var i = 0; i < l; i++) {
+      var tab = tabs[i];
+      if (id === tab.id) {
+        return tab;
+      }
+    }
+  }
+
+  function selectTab(tab) {
+    chrome.windows.update(tab.windowId, { focused: true });
+    chrome.tabs.update(tab.id, { selected: true });
+  }
+
   function contentListener(request, sender, sendResponse) {
     if (request.tabObjects) {
       sendResponse({ tabObjects: tabs });
@@ -39,9 +54,8 @@ console.log('background.js');
     }
   }
 
-  function selectTab(tab) {
-    chrome.windows.update(tab.windowId, { focused: true });
-    chrome.tabs.update(tab.id, { selected: true });
+  function init(){
+    getTabs();
   }
 
   chrome.runtime.onMessage.addListener(contentListener);
@@ -58,16 +72,6 @@ console.log('background.js');
     sortTabs(findTab(activeInfo.tabId));
   });
 
-  function findTab(id) {
-    var l = tabs.length;
-    for (var i = 0; i < l; i++) {
-      var tab = tabs[i];
-      if (id === tab.id) {
-        return tab;
-      }
-    }
-  }
-
-  getTabs();
+  init();
 
 })();

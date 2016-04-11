@@ -16,6 +16,7 @@
     "gulp-mocha": "^2.2.0",
     "gulp-sass": "^2.2.0",
     "gulp-size": "^2.1.0",
+    "gulp-util": "^3.0.7",
     "mocha": "^2.4.5",
     "run-sequence": "^1.1.5",
     "vinyl-source-stream": "^1.1.0",

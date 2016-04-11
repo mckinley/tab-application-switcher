@@ -31,8 +31,8 @@ gulp.task('locales', () => {
 
 gulp.task('html', () => {
   return gulp.src('app/**/*.html')
-    .pipe($.size({title: 'html'}))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist'))
+    .pipe($.size({title: 'html'}));
 });
 
 gulp.task('images', () => {
@@ -47,7 +47,7 @@ gulp.task('scripts', () => {
     return browserify('app/scripts/' + file)
       .add('app/scripts/lib/env/development.js')
       .transform('babelify', {presets: ['es2015']})
-      .bundle()
+      .bundle().on('error', $.util.log)
       .pipe(source(file))
       .pipe(gulp.dest('dist/scripts'))
       .pipe($.size({title: 'scripts'}));
@@ -63,7 +63,7 @@ gulp.task('styles', () => {
     .pipe($.size({title: 'styles'}));
 });
 
-gulp.task('test', ['build'], () => {
+gulp.task('test', () => {
   return gulp.src('app/test/**/*', {read: false})
     .pipe($.mocha());
 });
@@ -77,9 +77,9 @@ gulp.task('watch', () => {
   });
 
   function reload(){
-    console.log('-- reload');
+    $.util.log('-- reload');
     if(connection){
-      connection.send('reload-extension');
+      connection.send('reload-extension', $.util.log);
     }
   }
 
@@ -96,7 +96,7 @@ gulp.task('build', ['clean'], (cb) => {
 });
 
 gulp.task('dev', ['build'], (cb) => {
-  runSequence('watch', 'test', cb);
+  runSequence(['watch', 'test'], cb);
 
   gulp.watch(['app/test/**/*'], function(files){ return files.pipe($.mocha()); });
   gulp.watch(['app/scripts/**/*'], ['test']);
