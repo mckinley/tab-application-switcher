@@ -10,16 +10,22 @@ console.log('background.js');
   var tabs = [];
 
   function getTabs() {
-    chrome.windows.getAll({populate: true}, function(windows){
+    chrome.windows.getAll({ populate: true }, function(windows) {
       var focused;
-      windows.forEach(function(w){
-        if(w.focused){
+      var activeTab;
+      windows.forEach(function(w) {
+        if (w.focused) {
           focused = w;
         } else {
           tabs = w.tabs.concat(tabs);
         }
       });
-      tabs = focused.tabs.concat(tabs);
+      if (focused) {
+        tabs = focused.tabs.concat(tabs);
+        sortTab(focused.tabs.find(function(tab) {
+          return tab.active;
+        }));
+      }
     });
   }
 
@@ -47,6 +53,16 @@ console.log('background.js');
     chrome.tabs.update(tab.id, { selected: true });
   }
 
+  function executeContentScripts() {
+    chrome.tabs.query({}, function(tabs) {
+      tabs.forEach(function(tab) {
+        if (!tab.url.match('chrome.google.com/webstore/category/extensions') && !tab.url.match('chrome://')) {
+          chrome.tabs.executeScript(tab.id, { file: 'scripts/content.js', matchAboutBlank: true });
+        }
+      });
+    });
+  }
+
   function contentListener(request, sender, sendResponse) {
     if (request.tabObjects) {
       sendResponse({ tabObjects: tabs });
@@ -57,6 +73,7 @@ console.log('background.js');
 
   function init() {
     getTabs();
+    executeContentScripts();
   }
 
   chrome.runtime.onMessage.addListener(contentListener);
@@ -74,4 +91,5 @@ console.log('background.js');
   });
 
   init();
+
 })();

@@ -35,7 +35,7 @@
   document.addEventListener('keyup', onKeyUp);
 
   function getTabObjects(next) {
-    chrome.runtime.sendMessage({ tabObjects: true }, function(response) {
+    runtime().sendMessage({ tabObjects: true }, function(response) {
       tabObjects = response.tabObjects;
       next();
     });
@@ -73,7 +73,7 @@
       var tabIcon = document.createElement('div');
 
       tabTitle.setAttribute('title', tabObject.url);
-      if (tabObject.favIconUrl) {
+      if (tabObject.favIconUrl && tabObject.url != 'chrome://extensions/') {
         tabIcon.style.backgroundImage = "url('" + tabObject.favIconUrl + "')";
       }
 
@@ -109,6 +109,20 @@
   }
 
   function selectHighlightedTab() {
-    chrome.runtime.sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
+    runtime().sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
+  }
+
+  function destroy() {
+    document.removeEventListener('keydown', onKeyDown);
+    document.removeEventListener('keyup', onKeyUp);
+  }
+
+  function runtime() {
+    if (chrome.runtime && !!chrome.runtime.getManifest()) {
+      return chrome.runtime;
+    } else {
+      destroy();
+      return { sendMessage: function() {} };
+    }
   }
 })();
