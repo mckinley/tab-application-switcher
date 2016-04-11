@@ -10,23 +10,25 @@ console.log('background.js');
   var tabs = [];
 
   function getTabs() {
-    chrome.tabs.query({}, function(results) {
-      tabs = results;
-      for (var i = 0; i < tabs.length; i++) {
-        var tab = tabs[i];
-        if (tab.lastFocusedWindow) {
-          sortTabs(tab);
+    chrome.windows.getAll({populate: true}, function(windows){
+      var focused;
+      windows.forEach(function(w){
+        if(w.focused){
+          focused = w;
+        } else {
+          tabs = w.tabs.concat(tabs);
         }
-      }
+      });
+      tabs = focused.tabs.concat(tabs);
     });
   }
 
-  function sortTabs(tab) {
+  function sortTab(tab) {
     var index = tabs.indexOf(tab);
     if (index === -1) {
       tabs.unshift(tab);
     } else {
-      tabs.unshift(tabs.splice(tabs.indexOf(tab), 1)[0]);
+      tabs.unshift(tabs.splice(index, 1)[0]);
     }
   }
 
@@ -68,7 +70,7 @@ console.log('background.js');
   });
 
   chrome.tabs.onActivated.addListener(function(activeInfo) {
-    sortTabs(findTab(activeInfo.tabId));
+    sortTab(findTab(activeInfo.tabId));
   });
 
   init();

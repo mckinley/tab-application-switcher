@@ -8,7 +8,7 @@ connection.onerror = e => {
 
 connection.onmessage = e => {
   console.log('WebSocket Message:', e.data);
-  if (e.data === 'reload-extension') {
+  if (e.data === 'reload-extension' && typeof(chrome.runtime.reload) === 'function') {
     chrome.runtime.reload();
   }
 };
