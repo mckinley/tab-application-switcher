@@ -11,60 +11,60 @@ import gulpLoadPlugins from 'gulp-load-plugins';
 
 const $ = gulpLoadPlugins();
 
-gulp.task('clean', () => del(['dist/*'], {dot: true}));
+gulp.task('clean', () => del(['dist/*'], { dot: true }));
 
 gulp.task('manifest', () => {
-  return gulp.src([
-    'app/manifest.json'
-  ])
+  return gulp.src('app/manifest.json')
     .pipe(gulp.dest('dist'))
-    .pipe($.size({title: 'manifest'}))
+    .pipe($.size({ title: 'manifest' }))
 });
 
 gulp.task('locales', () => {
-  return gulp.src([
-    'app/_locales/**/*'
-  ])
+  return gulp.src('app/_locales/**/*')
     .pipe(gulp.dest('dist/_locales'))
-    .pipe($.size({title: 'locales'}))
+    .pipe($.size({ title: 'locales' }))
 });
 
 gulp.task('html', () => {
   return gulp.src('app/**/*.html')
     .pipe(gulp.dest('dist'))
-    .pipe($.size({title: 'html'}));
+    .pipe($.size({ title: 'html' }));
 });
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
     .pipe(gulp.dest('dist/images'))
-    .pipe($.size({title: 'images'}));
+    .pipe($.size({ title: 'images' }));
+});
+
+gulp.task('lint', () => {
+  return gulp.src(['app/scripts/**/*.js', 'test/**/*.js'])
+    .pipe($.eslint())
+    .pipe($.eslint.format());
 });
 
 gulp.task('scripts', () => {
-  var files = glob.sync('!(lib)', {cwd: 'app/scripts'});
+  var files = glob.sync('!(lib)', { cwd: 'app/scripts' });
   files.forEach((file) => {
     return browserify('app/scripts/' + file)
       .add('app/scripts/lib/env/development.js')
-      .transform('babelify', {presets: ['es2015']})
+      .transform('babelify', { presets: ['es2015'] })
       .bundle().on('error', $.util.log)
       .pipe(source(file))
       .pipe(gulp.dest('dist/scripts'))
-      .pipe($.size({title: 'scripts'}));
+      .pipe($.size({ title: 'scripts' }));
   });
 });
 
 gulp.task('styles', () => {
-  return gulp.src([
-    'app/styles/!(lib)'
-  ])
+  return gulp.src('app/styles/!(lib)')
     .pipe($.sass().on('error', $.sass.logError))
     .pipe(gulp.dest('dist/styles'))
-    .pipe($.size({title: 'styles'}));
+    .pipe($.size({ title: 'styles' }));
 });
 
 gulp.task('test', () => {
-  return gulp.src('app/test/**/*', {read: false})
+  return gulp.src('app/test/**/*', { read: false })
     .pipe($.mocha());
 });
 
@@ -72,34 +72,36 @@ gulp.task('watch', () => {
   var server = new ws.Server({ port: 8080 });
 
   var connection;
-  server.on('connection', function (ws) {
+  server.on('connection', function(ws) {
     connection = ws;
   });
 
-  function reload(){
+  function reload() {
     $.util.log('-- reload');
-    if(connection){
+    if (connection) {
       connection.send('reload-extension', $.util.log);
     }
   }
 
-  gulp.watch(['app/manifest.json'], ['manifest', reload]);
-  gulp.watch(['app/_locales/**/*'], ['locales', reload]);
-  gulp.watch(['app/**/*.html'], ['html', reload]);
-  gulp.watch(['app/images/**/*'], ['images', reload]);
-  gulp.watch(['app/scripts/**/*'], ['scripts', reload]);
-  gulp.watch(['app/styles/**/*'], ['styles', reload]);
+  gulp.watch('app/manifest.json', ['manifest', reload]);
+  gulp.watch('app/_locales/**/*', ['locales', reload]);
+  gulp.watch('app/**/*.html', ['html', reload]);
+  gulp.watch('app/images/**/*', ['images', reload]);
+  gulp.watch('app/scripts/**/*', ['scripts', reload]);
+  gulp.watch('app/styles/**/*', ['styles', reload]);
 });
 
 gulp.task('build', ['clean'], (cb) => {
   runSequence(['manifest', 'locales', 'html', 'images', 'scripts', 'styles'], cb);
 });
 
-gulp.task('dev', ['build'], (cb) => {
-  runSequence(['watch', 'test'], cb);
-
-  gulp.watch(['app/test/**/*'], function(files){ return files.pipe($.mocha()); });
-  gulp.watch(['app/scripts/**/*'], ['test']);
+gulp.task('dev', ['build', 'lint'], (cb) => {
+  runSequence(['test', 'watch'], cb);
+  gulp.watch('test/**/*', function(file) {
+    gulp.run('lint');
+    return gulp.src(file.path).pipe($.mocha());
+  });
+  gulp.watch('app/scripts/**/*', ['lint', 'test']);
 });
 
 gulp.task('default', ['build']);

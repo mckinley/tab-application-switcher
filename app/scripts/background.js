@@ -7,7 +7,6 @@ console.log(test);
 console.log('background.js');
 
 (function() {
-
   var tabs = [];
 
   function getTabs() {
@@ -54,7 +53,7 @@ console.log('background.js');
     }
   }
 
-  function init(){
+  function init() {
     getTabs();
   }
 
@@ -64,7 +63,7 @@ console.log('background.js');
     tabs.unshift(tab);
   });
 
-  chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+  chrome.tabs.onRemoved.addListener(function(tabId) {
     tabs.splice(tabs.indexOf(findTab(tabId)), 1);
   });
 
@@ -73,5 +72,4 @@ console.log('background.js');
   });
 
   init();
-
 })();

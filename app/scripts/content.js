@@ -1,7 +1,6 @@
 'use strict';
 
 (function() {
-
   console.log('content.js');
 
   var active;
@@ -12,10 +11,10 @@
   function onKeyDown(e) {
     if (e.metaKey) {
       if (e.keyCode === 18) { // Alt
-        if (!active) {
-          displayTabObjects();
-        } else {
+        if (active) {
           highlightNextTab();
+        } else {
+          displayTabObjects();
         }
       } else if (active && e.keyCode === 17) { // Control
         highlightPreviousTab();
@@ -26,7 +25,7 @@
   }
 
   function onKeyUp(e) {
-    if (active && e.keyCode == 91) { // Meta
+    if (active && e.keyCode === 91) { // Meta
       selectHighlightedTab();
       distroyTabObjects();
     }
@@ -95,7 +94,7 @@
 
   function highlightNextTab() {
     tabObjects[tabObjectsCursor].tabCon.classList.remove('TAS_highlighted');
-    if (tabObjectsCursor == tabObjects.length - 1) {
+    if (tabObjectsCursor === tabObjects.length - 1) {
       tabObjectsCursor = -1;
     }
     tabObjects[++tabObjectsCursor].tabCon.classList.add('TAS_highlighted');
@@ -103,7 +102,7 @@
 
   function highlightPreviousTab() {
     tabObjects[tabObjectsCursor].tabCon.classList.remove('TAS_highlighted');
-    if (tabObjectsCursor == 0) {
+    if (tabObjectsCursor === 0) {
       tabObjectsCursor = tabObjects.length;
     }
     tabObjects[--tabObjectsCursor].tabCon.classList.add('TAS_highlighted');
@@ -112,5 +111,4 @@
   function selectHighlightedTab() {
     chrome.runtime.sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
   }
-
 })();

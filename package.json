@@ -2,16 +2,18 @@
   "name": "tab-application-switcher",
   "private": true,
   "scripts": {
-    "test": "mocha test"
+    "install": "npm install"
   },
   "devDependencies": {
     "babel-core": "^6.7.6",
+    "babel-eslint": "^6.0.2",
     "babel-preset-es2015": "^6.6.0",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
     "del": "^2.2.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
+    "gulp-eslint": "^2.0.0",
     "gulp-load-plugins": "^1.2.0",
     "gulp-mocha": "^2.2.0",
     "gulp-sass": "^2.2.0",
@@ -21,5 +23,18 @@
     "run-sequence": "^1.1.5",
     "vinyl-source-stream": "^1.1.0",
     "ws": "^1.0.1"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "env": {
+      "es6": true,
+      "node": true,
+      "browser": true,
+      "mocha": true
+    },
+    "globals": {
+      "chrome": false
+    },
+    "rules": {}
   }
 }
