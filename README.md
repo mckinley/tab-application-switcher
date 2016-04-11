@@ -6,10 +6,12 @@
 
 Tracking features and taskes with [waffle.io](https://waffle.io/mckinley/tab-application-switcher).
 
-## Installation
+## Development
+- run `npm install`
+- run `node_modules/.bin/gulp dev`
 - go to `chrome://extensions/`
 - click 'Load unpacked extension...'
-- select the `app` directory
+- select the `dist` directory
 - click 'background page' if you want to see console output for the background script.
 
 ## Usage

@@ -1,5 +1,9 @@
 'use strict';
 
+import test from './lib/test.json';
+
+console.log(test);
+
 console.log('background.js');
 
 (function() {
