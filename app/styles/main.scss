@@ -1,43 +1,46 @@
 @import 'lib/test';
-.TAS_displayCon {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  text-align: left;
-  z-index: 1000;
+.TAS_root {
+  all: initial;
 }
 
-.TAS_tabCon {
-  position: relative;
-  margin: 4px;
-  border: 2px solid transparent;
-  cursor: pointer;
-}
-
-.TAS_highlighted {
-  background-color: rgba(0, 0, 0, 0.5);
-  border-color: white;
-  -webkit-border-radius: 8px;
-}
-
-.TAS_tabIcon {
-  position: absolute;
-  height: 16px;
-  width: 16px;
-  top: 4px;
-  left: 4px;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.TAS_tabTitle {
-  display: inline-block;
-  margin-left: 26px;
-  line-height: 24px;
-  vertical-align: middle;
+.TAS_root::shadow {
+  .TAS_displayCon {
+    all: initial;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: left;
+    z-index: 1000;
+  }
+  .TAS_tabCon {
+    position: relative;
+    margin: 4px;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  .TAS_highlighted {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: white;
+    -webkit-border-radius: 8px;
+  }
+  .TAS_tabIcon {
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 4px;
+    left: 4px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .TAS_tabTitle {
+    display: inline-block;
+    margin-left: 26px;
+    line-height: 24px;
+    vertical-align: middle;
+  }
 }

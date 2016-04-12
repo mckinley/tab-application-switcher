@@ -4,7 +4,7 @@
   console.log('content.js');
 
   var active;
-  var displayCon;
+  var root;
   var tabObjects;
   var tabObjectsCursor = 0;
 
@@ -50,8 +50,8 @@
 
   function distroyTabObjects() {
     if (active) {
-      document.body.removeChild(displayCon);
-      displayCon = undefined;
+      document.body.removeChild(root);
+      root = undefined;
       tabObjects = undefined;
       tabObjectsCursor = 0;
       active = false;
@@ -59,9 +59,13 @@
   }
 
   function display() {
-    displayCon = document.createElement('div');
+    root = document.createElement('div');
+    root.classList.add('TAS_root')
+    var shadow = root.createShadowRoot();
+    var displayCon = document.createElement('div');
     displayCon.classList.add('TAS_displayCon');
-    document.body.appendChild(displayCon);
+    document.body.appendChild(root);
+    shadow.appendChild(displayCon);
 
     var l = tabObjects.length;
     for (var i = 0; i < l; i++) {
