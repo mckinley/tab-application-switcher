@@ -60,7 +60,7 @@
 
   function display() {
     root = document.createElement('div');
-    root.classList.add('TAS_root')
+    root.classList.add('TAS_root');
     var shadow = root.createShadowRoot();
     var displayCon = document.createElement('div');
     displayCon.classList.add('TAS_displayCon');
@@ -73,17 +73,19 @@
 
       var tabCon = document.createElement('div');
       var tabTitle = document.createElement('div');
-      var tabTitleText = document.createTextNode(tabObject.title);
+      var tabTitleText = document.createElement('div')
       var tabIcon = document.createElement('div');
 
       tabTitle.setAttribute('title', tabObject.url);
+      tabTitleText.appendChild(document.createTextNode(tabObject.title));
       if (tabObject.favIconUrl && tabObject.url != 'chrome://extensions/') {
         tabIcon.style.backgroundImage = "url('" + tabObject.favIconUrl + "')";
       }
 
-      tabCon.classList.add('TAS_tabCon');
-      tabTitle.classList.add('TAS_tabTitle');
-      tabIcon.classList.add('TAS_tabIcon');
+      tabCon.classList.add('TAS_tabCon', 'mdl-card', 'mdl-shadow--2dp');
+      tabTitle.classList.add('TAS_tabTitle', 'mdl-card__title');
+      tabTitleText.classList.add('TAS_tabTitleText', 'mdl-typography--title');
+      tabIcon.classList.add('TAS_tabIcon', 'mdl-list__item-icon', 'mdl-shadow--1dp');
 
       displayCon.appendChild(tabCon);
       tabCon.appendChild(tabIcon);
@@ -129,4 +131,6 @@
       return { sendMessage: function() {} };
     }
   }
+
+  // displayTabObjects();
 })();

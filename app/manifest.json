@@ -36,6 +36,9 @@
       "styles/main.css"
     ]
   }],
+  "web_accessible_resources": [
+    "fonts/RobotoTTF/Roboto-Regular.ttf"
+  ],
   "omnibox": {
     "keyword": "OMNIBOX-KEYWORD"
   },

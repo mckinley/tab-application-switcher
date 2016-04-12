@@ -31,6 +31,12 @@ gulp.task('html', () => {
     .pipe($.size({ title: 'html' }));
 });
 
+gulp.task('fonts', () => {
+  return gulp.src('app/fonts/**/*')
+    .pipe(gulp.dest('dist/fonts'))
+    .pipe($.size({ title: 'fonts' }));
+});
+
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
     .pipe(gulp.dest('dist/images'))
@@ -58,7 +64,7 @@ gulp.task('scripts', () => {
 
 gulp.task('styles', () => {
   return gulp.src('app/styles/!(lib)')
-    .pipe($.sass().on('error', $.sass.logError))
+    .pipe($.sass({ includePaths: 'node_modules' }).on('error', $.sass.logError))
     .pipe(gulp.dest('dist/styles'))
     .pipe($.size({ title: 'styles' }));
 });
@@ -92,7 +98,7 @@ gulp.task('watch', () => {
 });
 
 gulp.task('build', ['clean'], (cb) => {
-  runSequence(['manifest', 'locales', 'html', 'images', 'scripts', 'styles'], cb);
+  runSequence(['manifest', 'locales', 'html', 'images', 'fonts', 'scripts', 'styles'], cb);
 });
 
 gulp.task('dev', ['build', 'lint'], (cb) => {
