@@ -53,7 +53,6 @@ gulp.task('scripts', () => {
   var files = glob.sync('!(lib)', { cwd: 'app/scripts' });
   files.forEach((file) => {
     return browserify('app/scripts/' + file)
-      .add('app/scripts/lib/env/development.js')
       .transform('babelify', { presets: ['es2015'] })
       .bundle().on('error', $.util.log)
       .pipe(source(file))
@@ -70,7 +69,7 @@ gulp.task('styles', () => {
 });
 
 gulp.task('test', () => {
-  return gulp.src('app/test/**/*', { read: false })
+  return gulp.src('test/**/*test.js', { read: false })
     .pipe($.mocha());
 });
 
@@ -78,7 +77,7 @@ gulp.task('watch', () => {
   var server = new ws.Server({ port: 8080 });
 
   var connection;
-  server.on('connection', function(ws) {
+  server.on('connection', (ws) => {
     connection = ws;
   });
 
@@ -103,7 +102,7 @@ gulp.task('build', ['clean'], (cb) => {
 
 gulp.task('dev', ['build', 'lint'], (cb) => {
   runSequence(['test', 'watch'], cb);
-  gulp.watch('test/**/*', function(file) {
+  gulp.watch('test/**/*test.js', (file) => {
     gulp.run('lint');
     return gulp.src(file.path).pipe($.mocha());
   });

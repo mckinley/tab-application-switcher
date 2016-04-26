@@ -1,3 +1,4 @@
+@import './lib/example';
 @font-face {
   font-family: 'Roboto';
   src: url('chrome-extension://__MSG_@@extension_id__/fonts/RobotoTTF/Roboto-Regular.ttf');
@@ -25,7 +26,7 @@
     width: auto;
     min-height: 20px;
     white-space: nowrap;
-    padding: 0 10px 0 54px;
+    padding: 0 10px 0 52px;
   }
   .TAS_highlighted {
     background-color: #758CA6;
@@ -35,8 +36,6 @@
   }
   .TAS_tabTitle {
     overflow: hidden;
-    box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
-    -webkit-border-radius: 2px;
   }
   .TAS_tabIcon {
     position: absolute;

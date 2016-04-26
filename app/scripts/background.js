@@ -1,12 +1,10 @@
 'use strict';
-
-import test from './lib/test.json';
-
-console.log(test);
-
-console.log('background.js');
+import example from './lib/example';
 
 (function() {
+  console.log(example);
+  console.log('background.js');
+
   var tabs;
 
   function getTabs() {
@@ -54,8 +52,10 @@ console.log('background.js');
   }
 
   function executeContentScripts() {
-    chrome.tabs.query({}, function(tabs) {
-      tabs.forEach(function(tab) {
+    // var manifest = chrome.app.getDetails();
+    // var scripts = manifest.content_scripts[0].js;
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
         if (!tab.url.match('chrome.google.com/webstore/category/extensions') && !tab.url.match('chrome://')) {
           chrome.tabs.executeScript(tab.id, { file: 'scripts/content.js', matchAboutBlank: true });
         }
@@ -89,6 +89,22 @@ console.log('background.js');
   chrome.tabs.onActivated.addListener(function(activeInfo) {
     sortTab(findTab(activeInfo.tabId));
   });
+
+  // Required for onDisconnect in content scripts to execute only when reload occurs.
+  chrome.runtime.onConnect.addListener(() => {});
+
+  var connection = new WebSocket('ws://localhost:8080');
+
+  connection.onerror = e => {
+    console.log('WebSocket Error:', e);
+  };
+
+  connection.onmessage = e => {
+    console.log('WebSocket Message:', e);
+    if (e.data === 'reload-extension') {
+      chrome.runtime.reload();
+    }
+  };
 
   init();
 

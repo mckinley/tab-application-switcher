@@ -35,7 +35,7 @@
   document.addEventListener('keyup', onKeyUp);
 
   function getTabObjects(next) {
-    runtime().sendMessage({ tabObjects: true }, function(response) {
+    chrome.runtime.sendMessage({ tabObjects: true }, function(response) {
       tabObjects = response.tabObjects;
       next();
     });
@@ -115,7 +115,7 @@
   }
 
   function selectHighlightedTab() {
-    runtime().sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
+    chrome.runtime.sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
   }
 
   function destroy() {
@@ -123,14 +123,10 @@
     document.removeEventListener('keyup', onKeyUp);
   }
 
-  function runtime() {
-    if (chrome.runtime && !!chrome.runtime.getManifest()) {
-      return chrome.runtime;
-    } else {
-      destroy();
-      return { sendMessage: function() {} };
-    }
-  }
+  let port = chrome.runtime.connect();
+  port.onDisconnect.addListener(() => {
+    destroy();
+  });
 
   // displayTabObjects();
 })();
