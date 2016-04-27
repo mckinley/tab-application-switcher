@@ -1,18 +1,6 @@
 const tabList = {};
 tabList.tabs = [];
 
-chrome.tabs.onCreated.addListener((tab) => {
-  tabList.tabs.unshift(tab);
-});
-
-chrome.tabs.onRemoved.addListener((tabId) => {
-  tabList.tabs.splice(tabList.tabs.indexOf(findTab(tabId)), 1);
-});
-
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  sortTab(findTab(activeInfo.tabId));
-});
-
 tabList.getTabs = () => {
   chrome.windows.getAll({ populate: true }, function(windows) {
     let focused;
@@ -25,9 +13,7 @@ tabList.getTabs = () => {
     });
     if (focused) {
       tabList.tabs = focused.tabs.concat(tabList.tabs);
-      sortTab(focused.tabs.find((tab) => {
-        return tab.active;
-      }));
+      unshiftTab(focused.tabs.find((tab) => tab.active));
     }
   });
 }
@@ -41,7 +27,7 @@ tabList.selectTab = (tab) => {
 export default tabList;
 
 
-function sortTab(tab) {
+function unshiftTab(tab) {
   let index = tabList.tabs.indexOf(tab);
   if (index === -1) {
     tabList.tabs.unshift(tab);
@@ -51,10 +37,17 @@ function sortTab(tab) {
 }
 
 function findTab(id) {
-  for (let i = 0; i < tabList.tabs.length; i++) {
-    let tab = tabList.tabs[i];
-    if (tab && tab.id === id) {
-      return tab;
-    }
-  }
+  return tabList.tabs.find((tab) => tab && tab.id === id);
 }
+
+chrome.tabs.onCreated.addListener((tab) => {
+  tabList.tabs.unshift(tab);
+});
+
+chrome.tabs.onRemoved.addListener((id) => {
+  tabList.tabs.splice(tabList.tabs.indexOf(findTab(id)), 1);
+});
+
+chrome.tabs.onActivated.addListener((info) => {
+  unshiftTab(findTab(info.tabId));
+});

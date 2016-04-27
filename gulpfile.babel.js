@@ -11,36 +11,37 @@ import gulpLoadPlugins from 'gulp-load-plugins';
 
 const $ = gulpLoadPlugins();
 
-gulp.task('clean', () => del(['dist/*'], { dot: true }));
+gulp.task('clean', () => {
+  return del(['dist/*'], { dot: true })
+});
 
 gulp.task('manifest', () => {
   return gulp.src('app/manifest.json')
-    .pipe(gulp.dest('dist'))
-    .pipe($.size({ title: 'manifest' }))
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('locales', () => {
   return gulp.src('app/_locales/**/*')
-    .pipe(gulp.dest('dist/_locales'))
-    .pipe($.size({ title: 'locales' }))
+    .pipe($.newer('dist/_locales'))
+    .pipe(gulp.dest('dist/_locales'));
 });
 
 gulp.task('html', () => {
   return gulp.src('app/**/*.html')
-    .pipe(gulp.dest('dist'))
-    .pipe($.size({ title: 'html' }));
+    .pipe($.newer('dist'))
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('fonts', () => {
   return gulp.src('app/fonts/**/*')
-    .pipe(gulp.dest('dist/fonts'))
-    .pipe($.size({ title: 'fonts' }));
+    .pipe($.newer('dist/fonts'))
+    .pipe(gulp.dest('dist/fonts'));
 });
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
-    .pipe(gulp.dest('dist/images'))
-    .pipe($.size({ title: 'images' }));
+    .pipe($.newer('dist/images'))
+    .pipe(gulp.dest('dist/images'));
 });
 
 gulp.task('lint', () => {
@@ -52,20 +53,21 @@ gulp.task('lint', () => {
 gulp.task('scripts', () => {
   var files = glob.sync('!(lib)', { cwd: 'app/scripts' });
   files.forEach((file) => {
-    return browserify('app/scripts/' + file)
+    browserify('app/scripts/' + file, { debug: true })
       .transform('babelify', { presets: ['es2015'] })
       .bundle().on('error', $.util.log)
       .pipe(source(file))
-      .pipe(gulp.dest('dist/scripts'))
-      .pipe($.size({ title: 'scripts' }));
+      .pipe(gulp.dest('dist/scripts'));
   });
 });
 
 gulp.task('styles', () => {
   return gulp.src('app/styles/!(lib)')
+    .pipe($.newer({ dest: 'dist/styles', ext: 'css' }))
+    .pipe($.sourcemaps.init())
     .pipe($.sass({ includePaths: 'node_modules' }).on('error', $.sass.logError))
-    .pipe(gulp.dest('dist/styles'))
-    .pipe($.size({ title: 'styles' }));
+    .pipe($.sourcemaps.write())
+    .pipe(gulp.dest('dist/styles'));
 });
 
 gulp.task('test', () => {
@@ -74,7 +76,7 @@ gulp.task('test', () => {
 });
 
 gulp.task('watch', () => {
-  var server = new ws.Server({ port: 8080 });
+  var server = new ws.Server({ port: 5454 });
 
   var connection;
   server.on('connection', (ws) => {
@@ -96,17 +98,19 @@ gulp.task('watch', () => {
   gulp.watch('app/styles/**/*', ['styles', reload]);
 });
 
-gulp.task('build', ['clean'], (cb) => {
+gulp.task('build', (cb) => {
   runSequence(['manifest', 'locales', 'html', 'images', 'fonts', 'scripts', 'styles'], cb);
 });
 
 gulp.task('dev', ['build', 'lint'], (cb) => {
   runSequence(['test', 'watch'], cb);
-  gulp.watch('test/**/*test.js', (file) => {
-    gulp.run('lint');
-    return gulp.src(file.path).pipe($.mocha());
-  });
   gulp.watch('app/scripts/**/*', ['lint', 'test']);
+  gulp.watch('test/**/*test.js', (file) => {
+    gulp.src(file.path)
+      .pipe($.eslint())
+      .pipe($.eslint.format())
+      .pipe($.mocha());
+  });
 });
 
 gulp.task('default', ['build']);

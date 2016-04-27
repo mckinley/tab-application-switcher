@@ -5,8 +5,8 @@
 
   var active;
   var root;
-  var tabObjects;
-  var tabObjectsCursor = 0;
+  var tabs;
+  var cursor = 0;
 
   function onKeyDown(e) {
     if (e.metaKey) {
@@ -14,12 +14,12 @@
         if (active) {
           highlightNextTab();
         } else {
-          displayTabObjects();
+          displayTabs();
         }
       } else if (active && e.keyCode === 17) { // Control
         highlightPreviousTab();
       } else if (e.keyCode === 27) { // Esc
-        distroyTabObjects();
+        deactivate();
       }
     }
   }
@@ -27,38 +27,41 @@
   function onKeyUp(e) {
     if (active && e.keyCode === 91) { // Meta
       selectHighlightedTab();
-      distroyTabObjects();
+      deactivate();
     }
   }
 
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
 
-  function getTabObjects(next) {
-    chrome.runtime.sendMessage({ tabObjects: true }, function(response) {
-      tabObjects = response.tabObjects;
-      next();
+  function getTabs(cb) {
+    chrome.runtime.sendMessage({ tabs: true }, function(response) {
+      tabs = response.tabs;
+      cb();
     });
   }
 
-  function displayTabObjects() {
+  function activate() {
     if (!active) {
-      getTabObjects(display);
-      active = true;
+      getTabs(() => {
+        render();
+        highlightNextTab();
+        active = true;
+      });
     }
   }
 
-  function distroyTabObjects() {
+  function deactivate() {
     if (active) {
       document.body.removeChild(root);
       root = undefined;
-      tabObjects = undefined;
-      tabObjectsCursor = 0;
+      tabs = undefined;
+      cursor = 0;
       active = false;
     }
   }
 
-  function display() {
+  function render() {
     root = document.createElement('div');
     root.classList.add('TAS_root');
     var shadow = root.createShadowRoot();
@@ -67,19 +70,19 @@
     document.body.appendChild(root);
     shadow.appendChild(displayCon);
 
-    var l = tabObjects.length;
+    var l = tabs.length;
     for (var i = 0; i < l; i++) {
-      var tabObject = tabObjects[i];
+      var tab = tabs[i];
 
       var tabCon = document.createElement('div');
       var tabTitle = document.createElement('div');
       var tabTitleText = document.createElement('div')
       var tabIcon = document.createElement('div');
 
-      tabTitle.setAttribute('title', tabObject.url);
-      tabTitleText.appendChild(document.createTextNode(tabObject.title));
-      if (tabObject.favIconUrl && tabObject.url != 'chrome://extensions/') {
-        tabIcon.style.backgroundImage = "url('" + tabObject.favIconUrl + "')";
+      tabTitle.setAttribute('title', tab.url);
+      tabTitleText.appendChild(document.createTextNode(tab.title));
+      if (tab.favIconUrl && tab.url != 'chrome://extensions/') {
+        tabIcon.style.backgroundImage = "url('" + tab.favIconUrl + "')";
       }
 
       tabCon.classList.add('TAS_tabCon', 'mdl-card', 'mdl-shadow--2dp');
@@ -92,41 +95,38 @@
       tabCon.appendChild(tabTitle);
       tabTitle.appendChild(tabTitleText);
 
-      tabObject.tabCon = tabCon;
+      tab.tabCon = tabCon;
     }
-
-    highlightNextTab();
   }
 
   function highlightNextTab() {
-    tabObjects[tabObjectsCursor].tabCon.classList.remove('TAS_highlighted');
-    if (tabObjectsCursor === tabObjects.length - 1) {
-      tabObjectsCursor = -1;
+    tabs[cursor].tabCon.classList.remove('TAS_highlighted');
+    if (cursor === tabs.length - 1) {
+      cursor = -1;
     }
-    tabObjects[++tabObjectsCursor].tabCon.classList.add('TAS_highlighted');
+    tabs[++cursor].tabCon.classList.add('TAS_highlighted');
   }
 
   function highlightPreviousTab() {
-    tabObjects[tabObjectsCursor].tabCon.classList.remove('TAS_highlighted');
-    if (tabObjectsCursor === 0) {
-      tabObjectsCursor = tabObjects.length;
+    tabs[cursor].tabCon.classList.remove('TAS_highlighted');
+    if (cursor === 0) {
+      cursor = tabs.length;
     }
-    tabObjects[--tabObjectsCursor].tabCon.classList.add('TAS_highlighted');
+    tabs[--cursor].tabCon.classList.add('TAS_highlighted');
   }
 
   function selectHighlightedTab() {
-    chrome.runtime.sendMessage({ selectTab: tabObjects[tabObjectsCursor] });
+    chrome.runtime.sendMessage({ selectTab: tabs[cursor] });
   }
 
   function destroy() {
     document.removeEventListener('keydown', onKeyDown);
     document.removeEventListener('keyup', onKeyUp);
+    deactivate();
   }
 
   let port = chrome.runtime.connect();
   port.onDisconnect.addListener(() => {
     destroy();
   });
-
-  // displayTabObjects();
 })();
