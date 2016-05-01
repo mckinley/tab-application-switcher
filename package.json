@@ -18,9 +18,7 @@
     "gulp-eslint": "^2.0.0",
     "gulp-load-plugins": "^1.2.0",
     "gulp-mocha": "^2.2.0",
-    "gulp-newer": "^1.1.0",
     "gulp-sass": "^2.2.0",
-    "gulp-size": "^2.1.0",
     "gulp-sourcemaps": "^2.0.0-alpha",
     "gulp-util": "^3.0.7",
     "material-design-lite": "^1.1.3",
@@ -29,18 +27,5 @@
     "sinon-chrome": "^1.1.2",
     "vinyl-source-stream": "^1.1.0",
     "ws": "^1.0.1"
-  },
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "env": {
-      "es6": true,
-      "node": true,
-      "browser": true,
-      "mocha": true
-    },
-    "globals": {
-      "chrome": false
-    },
-    "rules": {}
   }
 }
