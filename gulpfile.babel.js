@@ -22,25 +22,21 @@ gulp.task('manifest', () => {
 
 gulp.task('locales', () => {
   return gulp.src('app/_locales/**/*')
-    .pipe($.newer('dist/_locales'))
     .pipe(gulp.dest('dist/_locales'));
 });
 
 gulp.task('html', () => {
   return gulp.src('app/**/*.html')
-    .pipe($.newer('dist'))
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('fonts', () => {
   return gulp.src('app/fonts/**/*')
-    .pipe($.newer('dist/fonts'))
     .pipe(gulp.dest('dist/fonts'));
 });
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
-    .pipe($.newer('dist/images'))
     .pipe(gulp.dest('dist/images'));
 });
 
@@ -63,7 +59,6 @@ gulp.task('scripts', () => {
 
 gulp.task('styles', () => {
   return gulp.src('app/styles/!(lib)')
-    .pipe($.newer({ dest: 'dist/styles', ext: 'css' }))
     .pipe($.sourcemaps.init())
     .pipe($.sass({ includePaths: 'node_modules' }).on('error', $.sass.logError))
     .pipe($.sourcemaps.write())
@@ -98,10 +93,6 @@ gulp.task('watch', () => {
   gulp.watch('app/styles/**/*', ['styles', reload]);
 });
 
-gulp.task('build', (cb) => {
-  runSequence(['manifest', 'locales', 'html', 'images', 'fonts', 'scripts', 'styles'], cb);
-});
-
 gulp.task('dev', ['build', 'lint'], (cb) => {
   runSequence(['test', 'watch'], cb);
   gulp.watch('app/scripts/**/*', ['lint', 'test']);
@@ -112,5 +103,7 @@ gulp.task('dev', ['build', 'lint'], (cb) => {
       .pipe($.mocha());
   });
 });
+
+gulp.task('build', ['manifest', 'locales', 'html', 'images', 'fonts', 'scripts', 'styles']);
 
 gulp.task('default', ['build']);
