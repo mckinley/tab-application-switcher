@@ -1,4 +1,4 @@
-import init from './lib/init'
+import init from './lib/init';
 
 const connection = new WebSocket('ws://localhost:5454');
 

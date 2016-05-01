@@ -1,4 +1,4 @@
-import helper from '~/test/helper';
+import '~/test/helper';
 import subject from '~/app/scripts/lib/init';
 
 describe('export', () => {

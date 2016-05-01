@@ -10,7 +10,7 @@ import mousetrap from 'mousetrap';
   var tabs;
   var cursor = 0;
 
-  chrome.storage.onChanged.addListener((changes, namespace) => {
+  chrome.storage.onChanged.addListener((changes, _namespace) => {
     if(changes.keys){
       if (active) {
         deactivate();
@@ -69,7 +69,7 @@ import mousetrap from 'mousetrap';
       select();
       return false;
     }, 'keyup');
-    Mousetrap.bind(keys.cancel, () => {
+    mousetrap.bind(keys.cancel, () => {
       deactivate();
       return false;
     });
@@ -85,7 +85,7 @@ import mousetrap from 'mousetrap';
     mousetrap.unbind(keys.previous);
     mousetrap.unbind(keys.select);
     mousetrap.unbind(keys.modifier, 'keyup');
-    Mousetrap.unbind(keys.cancel);
+    mousetrap.unbind(keys.cancel);
 
     document.body.removeChild(root);
     root = undefined;
@@ -116,13 +116,13 @@ import mousetrap from 'mousetrap';
 
       var tabCon = document.createElement('div');
       var tabTitle = document.createElement('div');
-      var tabTitleText = document.createElement('div')
+      var tabTitleText = document.createElement('div');
       var tabIcon = document.createElement('div');
 
       tabTitle.setAttribute('title', tab.url);
       tabTitleText.appendChild(document.createTextNode(tab.title));
       if (tab.favIconUrl && tab.url != 'chrome://extensions/') {
-        tabIcon.style.backgroundImage = "url('" + tab.favIconUrl + "')";
+        tabIcon.style.backgroundImage = 'url(\'' + tab.favIconUrl + '\')';
       }
 
       tabCon.classList.add('TAS_tabCon', 'mdl-card', 'mdl-shadow--2dp');

@@ -16,12 +16,12 @@ tabList.getTabs = () => {
       unshiftTab(focused.tabs.find((tab) => tab.active));
     }
   });
-}
+};
 
 tabList.selectTab = (tab) => {
   chrome.windows.update(tab.windowId, { focused: true });
   chrome.tabs.update(tab.id, { selected: true });
-}
+};
 
 
 export default tabList;

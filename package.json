@@ -1,9 +1,6 @@
 {
   "name": "tab-application-switcher",
   "private": true,
-  "scripts": {
-    "test": "mocha test/**/*test.js"
-  },
   "devDependencies": {
     "babel-core": "^6.7.6",
     "babel-eslint": "^6.0.2",

@@ -8,10 +8,12 @@
   },
   "extends": "eslint:recommended",
   "globals": {
-    "chrome": false
+    "chrome": false,
+    "expect": false
   },
   "parser": "babel-eslint",
   "rules": {
+    "no-console": "off",
     "indent": [
       "error",
       2
@@ -20,6 +22,9 @@
       "error",
       "unix"
     ],
+    "no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_"
+    }],
     "quotes": [
       "error",
       "single"

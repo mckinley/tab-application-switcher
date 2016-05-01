@@ -12,7 +12,7 @@ import gulpLoadPlugins from 'gulp-load-plugins';
 const $ = gulpLoadPlugins();
 
 gulp.task('clean', () => {
-  return del(['dist/*'], { dot: true })
+  return del(['dist/*'], { dot: true });
 });
 
 gulp.task('manifest', () => {
@@ -44,6 +44,13 @@ gulp.task('lint', () => {
   return gulp.src(['app/scripts/**/*.js', 'test/**/*.js'])
     .pipe($.eslint())
     .pipe($.eslint.format());
+});
+
+gulp.task('format', ['lint'], () => {
+  return gulp.src(['app/scripts/**/*.js', 'test/**/*.js'], { base: '.' })
+    .pipe($.eslint({ fix: true }))
+    .pipe($.eslint.format())
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('scripts', () => {
