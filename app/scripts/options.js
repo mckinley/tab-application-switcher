@@ -1,3 +1,5 @@
+import defaultOptions from './lib/default-options.json';
+
 console.log('options.js');
 
 function save() {
@@ -20,13 +22,7 @@ function save() {
 }
 
 function init() {
-  chrome.storage.sync.get({
-    keys: {
-      modifier: 'alt',
-      next: 'tab',
-      previous: '`'
-    }
-  }, function(storage) {
+  chrome.storage.sync.get(defaultOptions, (storage) => {
     document.getElementById('key-modifier').value = storage.keys.modifier;
     document.getElementById('key-next').value = storage.keys.next;
     document.getElementById('key-previous').value = storage.keys.previous;

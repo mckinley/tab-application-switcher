@@ -1,4 +1,5 @@
 'use strict';
+import defaultOptions from './lib/default-options.json';
 import mousetrap from 'mousetrap';
 
 (function() {
@@ -20,7 +21,7 @@ import mousetrap from 'mousetrap';
     }
   });
 
-  chrome.storage.sync.get('keys', (storage) => {
+  chrome.storage.sync.get(defaultOptions, (storage) => {
     initKeys(storage.keys);
   });
 
