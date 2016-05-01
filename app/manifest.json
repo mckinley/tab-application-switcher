@@ -18,7 +18,8 @@
     "http://*/*",
     "https://*/*",
     "background",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "options_ui": {
     "chrome_style": true,

@@ -1,64 +1,104 @@
 'use strict';
+import mousetrap from 'mousetrap';
 
 (function() {
   console.log('content.js');
 
+  var keys;
   var active;
   var root;
   var tabs;
   var cursor = 0;
 
-  function onKeyDown(e) {
-    if (e.metaKey) {
-      if (e.keyCode === 18) { // Alt
-        if (active) {
-          highlightNextTab();
-        } else {
-          displayTabs();
-        }
-      } else if (active && e.keyCode === 17) { // Control
-        highlightPreviousTab();
-      } else if (e.keyCode === 27) { // Esc
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    if(changes.keys){
+      if (active) {
         deactivate();
       }
+      mousetrap.unbind(keys.next);
+      initKeys(changes.keys.newValue);
+    }
+  });
+
+  chrome.storage.sync.get('keys', (storage) => {
+    initKeys(storage.keys);
+  });
+
+  function initKeys(value) {
+    keys = value;
+    let modifier = keys.modifier;
+
+    keys.next = modifier + '+' + keys.next;
+    keys.previous = modifier + '+' + keys.previous;
+    keys.select = modifier + '+' + 'enter';
+    keys.cancel = modifier + '+' + 'esc';
+
+    mousetrap.bind(keys.next, () => {
+      next();
+      return false;
+    });
+  }
+
+  function next() {
+    if (!active) {
+      activate();
+    } else {
+      highlightNextTab();
     }
   }
 
-  function onKeyUp(e) {
-    if (active && e.keyCode === 91) { // Meta
-      selectHighlightedTab();
+  function previous() {
+    highlightPreviousTab();
+  }
+
+  function select() {
+    selectHighlightedTab();
+    deactivate();
+  }
+
+  function activate() {
+    mousetrap.bind(keys.previous, () => {
+      previous();
+      return false;
+    });
+    mousetrap.bind(keys.select, () => {
+      select();
+      return false;
+    });
+    mousetrap.bind(keys.modifier, () => {
+      select();
+      return false;
+    }, 'keyup');
+    Mousetrap.bind(keys.cancel, () => {
       deactivate();
-    }
+      return false;
+    });
+
+    getTabs(() => {
+      render();
+      highlightNextTab();
+      active = true;
+    });
   }
 
-  document.addEventListener('keydown', onKeyDown);
-  document.addEventListener('keyup', onKeyUp);
+  function deactivate() {
+    mousetrap.unbind(keys.previous);
+    mousetrap.unbind(keys.select);
+    mousetrap.unbind(keys.modifier, 'keyup');
+    Mousetrap.unbind(keys.cancel);
+
+    document.body.removeChild(root);
+    root = undefined;
+    tabs = undefined;
+    cursor = 0;
+    active = false;
+  }
 
   function getTabs(cb) {
     chrome.runtime.sendMessage({ tabs: true }, function(response) {
       tabs = response.tabs;
       cb();
     });
-  }
-
-  function activate() {
-    if (!active) {
-      getTabs(() => {
-        render();
-        highlightNextTab();
-        active = true;
-      });
-    }
-  }
-
-  function deactivate() {
-    if (active) {
-      document.body.removeChild(root);
-      root = undefined;
-      tabs = undefined;
-      cursor = 0;
-      active = false;
-    }
   }
 
   function render() {
@@ -120,9 +160,11 @@
   }
 
   function destroy() {
-    document.removeEventListener('keydown', onKeyDown);
-    document.removeEventListener('keyup', onKeyUp);
-    deactivate();
+    if (active) {
+      deactivate();
+    }
+    mousetrap.unbind(keys.next);
+    keys = undefined;
   }
 
   let port = chrome.runtime.connect();
