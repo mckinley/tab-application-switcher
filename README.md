@@ -2,9 +2,9 @@
 
 - Its like your systems Application Switcher, but for your Chrome tabs.
 - Quickly get a view of all your open tabs when they get crowded at the top of your browser.
-- Includes page title, and icon if present on the tabed page, and a tool-tip containing the tab's url.
+- Includes page title, and icon if present on the tabbed page, and a tool-tip containing the tab's url.
 
-Tracking features and taskes with [waffle.io](https://waffle.io/mckinley/tab-application-switcher).
+Tracking features and tasks with [waffle.io](https://waffle.io/mckinley/tab-application-switcher).
 
 ## Development
 - run `npm install`
@@ -18,4 +18,3 @@ Tracking features and taskes with [waffle.io](https://waffle.io/mckinley/tab-app
 - hold `Command` and move backwards and forwards through your tab history with `Alt` and `Control`
 - release the `Command` key to select the highlighted tab
 - works across windows
-

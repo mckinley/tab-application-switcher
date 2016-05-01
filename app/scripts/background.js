@@ -14,6 +14,7 @@ connection.onmessage = e => {
 };
 
 // Required for onDisconnect in content scripts to execute only when reload occurs.
+// Without a listener onDesconnect is called immediatly.
 chrome.runtime.onConnect.addListener(() => {});
 
 init();
