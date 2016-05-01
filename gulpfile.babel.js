@@ -6,6 +6,7 @@ import del from 'del';
 import ws from 'ws';
 import browserify from 'browserify';
 import source from 'vinyl-source-stream';
+import eventStream from 'event-stream';
 import runSequence from 'run-sequence';
 import gulpLoadPlugins from 'gulp-load-plugins';
 
@@ -54,14 +55,15 @@ gulp.task('format', ['lint'], () => {
 });
 
 gulp.task('scripts', () => {
-  var files = glob.sync('!(lib)', { cwd: 'app/scripts' });
-  files.forEach((file) => {
-    browserify('app/scripts/' + file, { debug: true })
+  let files = glob.sync('!(lib)', { cwd: 'app/scripts' });
+  let tasks = files.map((file) => {
+    return browserify('app/scripts/' + file, { debug: true })
       .transform('babelify', { presets: ['es2015'] })
       .bundle().on('error', $.util.log)
       .pipe(source(file))
       .pipe(gulp.dest('dist/scripts'));
   });
+  return eventStream.merge.apply(null, tasks);
 });
 
 gulp.task('styles', () => {
@@ -78,9 +80,9 @@ gulp.task('test', () => {
 });
 
 gulp.task('watch', () => {
-  var server = new ws.Server({ port: 5454 });
+  let server = new ws.Server({ port: 5454 });
 
-  var connection;
+  let connection;
   server.on('connection', (ws) => {
     connection = ws;
   });
@@ -92,12 +94,12 @@ gulp.task('watch', () => {
     }
   }
 
-  gulp.watch('app/manifest.json', ['manifest', reload]);
-  gulp.watch('app/_locales/**/*', ['locales', reload]);
-  gulp.watch('app/**/*.html', ['html', reload]);
-  gulp.watch('app/images/**/*', ['images', reload]);
-  gulp.watch('app/scripts/**/*', ['scripts', reload]);
-  gulp.watch('app/styles/**/*', ['styles', reload]);
+  gulp.watch('app/manifest.json', () => { runSequence('manifest', reload); });
+  gulp.watch('app/_locales/**/*', () => { runSequence('locales', reload); });
+  gulp.watch('app/**/*.html', () => { runSequence('html', reload); });
+  gulp.watch('app/images/**/*', () => { runSequence('images', reload); });
+  gulp.watch('app/scripts/**/*', () => { runSequence('scripts', reload); });
+  gulp.watch('app/styles/**/*', () => { runSequence('styles', reload); });
 });
 
 gulp.task('dev', ['build', 'lint'], (cb) => {
