@@ -1,5 +1,5 @@
 import '~/test/helper';
-import subject from '~/app/scripts/lib/init';
+import subject from '~/app/scripts/lib/display';
 
 describe('export', () => {
   it('should exist', () => {
