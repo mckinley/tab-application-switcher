@@ -41,7 +41,7 @@
     "fonts/RobotoTTF/Roboto-Regular.ttf"
   ],
   "omnibox": {
-    "keyword": "OMNIBOX-KEYWORD"
+    "keyword": "tas"
   },
   "browser_action": {
     "default_icon": {

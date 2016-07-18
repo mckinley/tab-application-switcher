@@ -1,6 +1,7 @@
 export default class TabList {
 
-  constructor() {
+  constructor(eventEmitter) {
+    this.eventEmitter = eventEmitter;
     this.tabs = [];
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -9,6 +10,10 @@ export default class TabList {
       } else if (request.selectTab) {
         this.selectTab(request.selectTab);
       }
+    });
+
+    this.eventEmitter.on('omnibox:select-tab', (tab) => {
+      this.selectTab(tab);
     });
 
     chrome.tabs.onCreated.addListener((tab) => {
@@ -51,6 +56,8 @@ export default class TabList {
         this.tabs = focused.tabs.concat(this.tabs);
         this.unshiftTab(focused.tabs.find((tab) => tab.active));
       }
+
+      this.eventEmitter.emit('tab-list:tabs', this.tabs);
     });
   }
 
