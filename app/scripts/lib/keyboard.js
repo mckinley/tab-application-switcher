@@ -20,7 +20,7 @@ export default class Keyboard {
       }
     });
 
-    this.eventEmitter.on('connection:disconnect', this.destroy);
+    chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy(); });
   }
 
   activate() {

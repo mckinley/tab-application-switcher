@@ -1,8 +1,6 @@
 export default class TabList {
 
-  constructor(eventEmitter) {
-    this.eventEmitter = eventEmitter;
-    this.tabList = {};
+  constructor() {
     this.tabs = [];
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -25,14 +23,16 @@ export default class TabList {
       this.unshiftTab(this.findTab(info.tabId));
     });
 
-    this.eventEmitter.on('connection:disconnect', this.destroy);
+    chrome.runtime.onMessage.addListener((request, sender, _sendResponse) => {
+      if (request.connection === 'disconnect') {
+        this.destroy();
+      }
+    });
 
     this.getTabs();
   }
 
   destroy() {
-    this.eventEmitter = undefined;
-    this.tabList = undefined;
     this.tabs = undefined;
   }
 
@@ -46,6 +46,7 @@ export default class TabList {
           this.tabs = w.tabs.concat(this.tabs);
         }
       });
+
       if (focused) {
         this.tabs = focused.tabs.concat(this.tabs);
         this.unshiftTab(focused.tabs.find((tab) => tab.active));
