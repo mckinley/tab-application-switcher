@@ -1,6 +1,6 @@
 export default class Display {
 
-  constructor(eventEmitter){
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.active = false;
     this.cursor = 0;
@@ -8,7 +8,7 @@ export default class Display {
     this.tabs;
 
     this.eventEmitter.on('keyboard:next', () => {
-      if(!this.active){
+      if (!this.active) {
         this.activate();
       } else {
         this.highlightNextTab();
@@ -54,6 +54,12 @@ export default class Display {
     this.cursor = undefined;
     this.root = undefined;
     this.tabs = undefined;
+  }
+
+  highlightTab(tab){
+    this.tabs[this.cursor].tabCon.classList.remove('TAS_highlighted');
+    this.cursor = tab.cursor;
+    this.tabs[this.cursor].tabCon.classList.add('TAS_highlighted');
   }
 
   highlightNextTab() {
@@ -117,6 +123,17 @@ export default class Display {
       tabCon.appendChild(tabTitle);
       tabTitle.appendChild(tabTitleText);
 
+
+      tabCon.addEventListener('mouseover', () => {
+        this.highlightTab(tab);
+      });
+
+      tabCon.addEventListener('click', () => {
+        this.selectHighlightedTab();
+        this.deactivate();
+      });
+
+      tab.cursor = i;
       tab.tabCon = tabCon;
     }
   }

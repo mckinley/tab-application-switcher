@@ -1,7 +1,5 @@
 import defaultOptions from './lib/default-options.json';
 
-console.log('options.js');
-
 function save() {
   var keyModifier = document.getElementById('key-modifier').value;
   var keyNext = document.getElementById('key-next').value;
