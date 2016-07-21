@@ -109,7 +109,7 @@ export default class Display {
 
       tabTitle.setAttribute('title', tab.url);
       tabTitleText.appendChild(document.createTextNode(tab.title));
-      if (tab.favIconUrl.indexOf('chrome://theme/') !== 0) {
+      if (tab.favIconUrl && tab.favIconUrl.indexOf('chrome://theme/') !== 0) {
         tabIcon.style.backgroundImage = 'url(\'' + tab.favIconUrl + '\')';
       }
 

@@ -5,7 +5,7 @@
 }
 
 .TAS_popup {
-  width: 600px;
+  width: 408px;
   height: 800px;
 }
 
@@ -14,40 +14,44 @@
 }
 
 .TAS_root::shadow {
-  @import 'material-design-lite/material.min';
   .TAS_displayCon {
     position: fixed;
     top: 0px;
-    left: 0px;
-    width: 100%;
+    right: 0px;
+    width: 400px;
     height: 100%;
     z-index: 99999999999999999999;
-    background-color: white;
+    background-color: #fcfcfc;
+    border-left: solid 8px #efefef;
+    font-size: 12px;
+    font-family: 'Roboto';
   }
   .TAS_tabCon {
     position: relative;
-    margin: 8px 20px;
+    border-bottom: solid 1px #efefef;
+    background-color: white;
     cursor: pointer;
-    width: auto;
-    min-height: 20px;
+    height: 32px;
     white-space: nowrap;
-    padding: 0 10px 0 52px;
+    padding: 0 10px 0 30px;
   }
   .TAS_highlighted {
-    background-color: #758CA6;
+    background-color: #efefef;
   }
   .TAS_highlighted .TAS_tabTitle {
-    color: white;
+    color: #333;
   }
   .TAS_tabTitle {
     overflow: hidden;
+    line-height: 32px;
+    vertical-align: middle;
   }
   .TAS_tabIcon {
     position: absolute;
-    height: 30px;
-    width: 30px;
-    top: 12px;
-    left: 12px;
+    height: 16px;
+    width: 16px;
+    top: 8px;
+    left: 8px;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
