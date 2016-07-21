@@ -56,7 +56,7 @@ export default class Display {
     this.tabs = undefined;
   }
 
-  highlightTab(tab){
+  highlightTab(tab) {
     this.tabs[this.cursor].tabCon.classList.remove('TAS_highlighted');
     this.cursor = tab.cursor;
     this.tabs[this.cursor].tabCon.classList.add('TAS_highlighted');
@@ -109,7 +109,7 @@ export default class Display {
 
       tabTitle.setAttribute('title', tab.url);
       tabTitleText.appendChild(document.createTextNode(tab.title));
-      if (tab.favIconUrl && tab.url != 'chrome://extensions/') {
+      if (tab.favIconUrl.indexOf('chrome://theme/') !== 0) {
         tabIcon.style.backgroundImage = 'url(\'' + tab.favIconUrl + '\')';
       }
 
