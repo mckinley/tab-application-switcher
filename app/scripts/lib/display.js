@@ -91,12 +91,22 @@ export default class Display {
 
   render() {
     this.root = document.createElement('div');
-    this.root.classList.add('TAS_root');
     var shadow = this.root.createShadowRoot();
     var displayCon = document.createElement('div');
+    let searchCon = document.createElement('div');
+    let searchInput = document.createElement('input');
+    searchInput.setAttribute('type', 'search');
+    searchInput.setAttribute('placeholder', 'search page titles or urls');
+
+    this.root.classList.add('TAS_root');
     displayCon.classList.add('TAS_displayCon');
+    searchCon.classList.add('TAS_searchCon');
+    searchInput.classList.add('TAS_searchInput');
+
     document.body.appendChild(this.root);
     shadow.appendChild(displayCon);
+    displayCon.appendChild(searchCon);
+    searchCon.appendChild(searchInput);
 
     let l = this.tabs.length;
     for (let i = 0; i < l; i++) {
@@ -113,10 +123,10 @@ export default class Display {
         tabIcon.style.backgroundImage = 'url(\'' + tab.favIconUrl + '\')';
       }
 
-      tabCon.classList.add('TAS_tabCon', 'mdl-card', 'mdl-shadow--2dp');
-      tabTitle.classList.add('TAS_tabTitle', 'mdl-card__title');
-      tabTitleText.classList.add('TAS_tabTitleText', 'mdl-typography--title');
-      tabIcon.classList.add('TAS_tabIcon', 'mdl-list__item-icon', 'mdl-shadow--1dp');
+      tabCon.classList.add('TAS_tabCon');
+      tabTitle.classList.add('TAS_tabTitle');
+      tabTitleText.classList.add('TAS_tabTitleText');
+      tabIcon.classList.add('TAS_tabIcon');
 
       displayCon.appendChild(tabCon);
       tabCon.appendChild(tabIcon);
@@ -131,6 +141,10 @@ export default class Display {
       tabCon.addEventListener('click', () => {
         this.selectHighlightedTab();
         this.deactivate();
+      });
+
+      searchInput.addEventListener('focus', () => {
+        // this.searchMode = true;
       });
 
       tab.cursor = i;
