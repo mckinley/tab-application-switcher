@@ -43,6 +43,7 @@ export default class Keyboard {
 
     mousetrap.bind(this.keys.cancel, () => {
       this.eventEmitter.emit('keyboard:cancel');
+      this.deactivate();
       return false;
     });
   }

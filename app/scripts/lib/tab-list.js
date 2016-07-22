@@ -17,7 +17,15 @@ export default class TabList {
     });
 
     chrome.tabs.onCreated.addListener((tab) => {
-      this.tabs.unshift(tab);
+      if(tab.active) {
+        this.tabs.unshift(tab);
+      }else{
+        this.tabs.push(tab);
+      }
+    });
+
+    chrome.tabs.onUpdated.addListener((tabId, _changeInfo, tab) => {
+      this.tabs[this.tabs.indexOf(this.findTab(tabId))] = tab;
     });
 
     chrome.tabs.onRemoved.addListener((id) => {
