@@ -96,7 +96,7 @@ export default class Display {
     let searchCon = document.createElement('div');
     let searchInput = document.createElement('input');
     searchInput.setAttribute('type', 'search');
-    searchInput.setAttribute('placeholder', 'search page titles or urls');
+    searchInput.setAttribute('placeholder', 'search page titles and urls');
 
     this.root.classList.add('TAS_root');
     displayCon.classList.add('TAS_displayCon');
