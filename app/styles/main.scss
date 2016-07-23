@@ -3,27 +3,23 @@
   font-family: 'Roboto';
   src: url('chrome-extension://__MSG_@@extension_id__/fonts/RobotoTTF/Roboto-Regular.ttf');
 }
-
 .TAS_popup {
   width: 408px;
   height: 600px;
-
   body {
     height: 600px;
     overflow: hidden;
   }
 }
-
 .TAS_root {
   all: initial;
 }
-
 .TAS_root::shadow {
   .TAS_displayCon {
     position: fixed;
     overflow: scroll;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
     width: 400px;
     height: 100%;
     z-index: 99999999999999999999;
@@ -54,9 +50,14 @@
     font-size: 12px;
     height: 50px;
     margin: 0;
-    padding: 0 10px 0 10px;
+    padding: 0 10px;
     border: solid 8px #f1f1f1;
     border-radius: 25px;
+
+    &::-webkit-input-placeholder {
+      color: #a1a1a1;
+      padding-left: 6px;
+    }
   }
   .TAS_highlighted {
     background-color: #f1f1f1;
