@@ -1,10 +1,10 @@
 # Tab Application Switcher
 
-- Its like your systems Application Switcher, but for your Chrome tabs.
-- Quickly get a view of all your open tabs when they get crowded at the top of your browser.
-- Includes page title, and icon if present on the tabbed page, and a tool-tip containing the tab's url.
-
-Tracking features and tasks with [waffle.io](https://waffle.io/mckinley/tab-application-switcher).
+- It's like your system's Application Switcher, but for your Chrome tabs.
+- Tabs can be accessed with intelligent key commands.
+- Tabs in the default display are ordered by their use. The last tab you used is the first tab to select.
+- Tabs can be searched by url and page title.
+- Display appears in your current window if you use the configurable key commands. It is also available as an extension action in the chrome menu area.
 
 ## Development
 - run `npm install`
@@ -12,9 +12,8 @@ Tracking features and tasks with [waffle.io](https://waffle.io/mckinley/tab-appl
 - go to `chrome://extensions/`
 - click 'Load unpacked extension...'
 - select the `dist` directory
-- click 'background page' if you want to see console output for the background script.
 
-## Usage
-- hold `Command` and move backwards and forwards through your tab history with `Alt` and `Control`
-- release the `Command` key to select the highlighted tab
-- works across windows
+## Example of default key command usage
+- Hold `Alt`. Press `Tab` to move back through your most recent tabs.
+- Continue holding `Alt`, press `` ` `` to move forward though your tabs.
+- Release `Alt` to select your currently highlighted tab.
