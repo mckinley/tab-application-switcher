@@ -17,19 +17,23 @@ export default class TabList {
     });
 
     chrome.tabs.onCreated.addListener((tab) => {
-      if(tab.active) {
+      if (tab.active) {
         this.tabs.unshift(tab);
-      }else{
+      } else {
         this.tabs.push(tab);
       }
     });
 
-    chrome.tabs.onUpdated.addListener((tabId, _changeInfo, tab) => {
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       this.tabs[this.tabs.indexOf(this.findTab(tabId))] = tab;
     });
 
+    chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+      this.removeTab(removedTabId);
+    });
+
     chrome.tabs.onRemoved.addListener((id) => {
-      this.tabs.splice(this.tabs.indexOf(this.findTab(id)), 1);
+      this.removeTab(id);
     });
 
     chrome.tabs.onActivated.addListener((info) => {
@@ -82,6 +86,10 @@ export default class TabList {
     } else {
       this.tabs.unshift(this.tabs.splice(index, 1)[0]);
     }
+  }
+
+  removeTab(id) {
+    this.tabs.splice(this.tabs.indexOf(this.findTab(id)), 1);
   }
 
   findTab(id) {
