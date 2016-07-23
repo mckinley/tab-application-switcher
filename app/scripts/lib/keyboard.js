@@ -1,21 +1,32 @@
 import defaultOptions from './default-options.json';
-import mousetrap from 'mousetrap';
+import Mousetrap from 'mousetrap';
 
 export default class Keyboard {
 
-  constructor(eventEmitter){
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.active = false;
     this.keys;
 
+    this.keyBinder = new Mousetrap();
+    this.activateKeyBinder = new Mousetrap();
+
+    this.eventEmitter.on('display:search', () => {
+      this.keyBinder.unbind(this.keys.modifier, 'keyup');
+    });
+
+    this.eventEmitter.on('display:select', () => {
+      this.deactivate();
+    });
+
     chrome.storage.onChanged.addListener((changes, _namespace) => {
-      if(changes.keys.newValue){
+      if (changes.keys.newValue) {
         this.updateKeys(changes.keys.newValue);
       }
     });
 
     chrome.storage.sync.get(defaultOptions, (storage) => {
-      if(storage.keys){
+      if (storage.keys) {
         this.initKeys(storage.keys);
       }
     });
@@ -24,43 +35,74 @@ export default class Keyboard {
   }
 
   activate() {
-    mousetrap.bind(this.keys.previous, () => {
+    if (this.active) return;
+
+    this.bindKeyset(this.keys.next, () => {
+      this.eventEmitter.emit('keyboard:next');
+      return false;
+    });
+
+    this.bindKeyset(this.keys.previous, () => {
       this.eventEmitter.emit('keyboard:previous');
       return false;
     });
 
-    mousetrap.bind(this.keys.select, () => {
+    this.bindKeyset(this.keys.select, () => {
       this.eventEmitter.emit('keyboard:select');
-      this.select();
+      this.deactivate();
       return false;
     });
 
-    mousetrap.bind(this.keys.modifier, () => {
-      this.eventEmitter.emit('keyboard:select');
-      this.select();
-      return false;
-    }, 'keyup');
-
-    mousetrap.bind(this.keys.cancel, () => {
+    this.bindKeyset(this.keys.cancel, () => {
       this.eventEmitter.emit('keyboard:cancel');
       this.deactivate();
       return false;
     });
+
+    this.keyBinder.bind(this.keys.modifier, () => {
+      this.eventEmitter.emit('keyboard:select');
+      this.deactivate();
+      return false;
+    }, 'keyup');
+
+    this.activateKeyBinder.unbind(this.keys.activate);
+
+    this.active = true;
   }
 
   deactivate() {
-    mousetrap.unbind(this.keys.previous);
-    mousetrap.unbind(this.keys.select);
-    mousetrap.unbind(this.keys.modifier, 'keyup');
-    mousetrap.unbind(this.keys.cancel);
+    if (!this.active) return;
+
+    this.unbindKeyset(this.keys.next);
+    this.unbindKeyset(this.keys.previous);
+    this.unbindKeyset(this.keys.select);
+    this.unbindKeyset(this.keys.cancel);
+    this.keyBinder.unbind(this.keys.modifier, 'keyup');
+
+    this.activateKeyBinder.bind(this.keys.activate, () => {
+      this.eventEmitter.emit('keyboard:activate');
+      this.activate();
+      return false;
+    });
+
     this.active = false;
   }
 
+  bindKeyset(keyset, cb) {
+    keyset.forEach((k) => {
+      this.keyBinder.bind(k, cb);
+    });
+  }
+
+  unbindKeyset(keyset) {
+    keyset.forEach((k) => {
+      this.keyBinder.unbind(k);
+    });
+  }
+
   destroy() {
-    if (this.active) {
-      this.deactivate();
-    }
-    mousetrap.unbind(this.keys.next);
+    this.deactivate();
+    this.activateKeyBinder.bind(this.keys.activate);
     this.eventEmitter = undefined;
     this.keys = undefined;
   }
@@ -71,33 +113,22 @@ export default class Keyboard {
     let k = this.keys;
     let m = this.keys.modifier;
 
-    k.next = m + '+' + k.next;
-    k.previous = m + '+' + k.previous;
-    k.select = m + '+' + 'enter';
-    k.cancel = m + '+' + 'esc';
+    k.activate = m + '+' + k.next;
+    k.next = [k.activate, m + '+' + 'right', 'right', m + '+' + 'down', 'down'];
+    k.previous = [m + '+' + k.previous, m + '+' + 'left', 'left', m + '+' + 'up', 'up'];
+    k.select = [m + '+' + 'enter', 'enter'];
+    k.cancel = [m + '+' + 'esc', 'esc'];
 
-    mousetrap.bind(this.keys.next, () => {
-      this.eventEmitter.emit('keyboard:next');
-      this.next();
+    this.activateKeyBinder.bind(k.activate, () => {
+      this.eventEmitter.emit('keyboard:activate');
+      this.activate();
       return false;
     });
   }
 
-  updateKeys(value){
-    if (this.active) {
-      this.deactivate();
-    }
-    mousetrap.unbind(this.keys.next);
-    this.initKeys(value);
-  }
-
-  next() {
-    if (!this.active) {
-      this.activate();
-    }
-  }
-
-  select() {
+  updateKeys(value) {
     this.deactivate();
+    this.keyBinder.unbind(this.keys.next);
+    this.initKeys(value);
   }
 }

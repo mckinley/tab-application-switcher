@@ -7,12 +7,12 @@ export default class Display {
     this.root;
     this.tabs;
 
+    this.eventEmitter.on('keyboard:activate', () => {
+      this.activate();
+    });
+
     this.eventEmitter.on('keyboard:next', () => {
-      if (!this.active) {
-        this.activate();
-      } else {
-        this.highlightNextTab();
-      }
+      this.highlightNextTab();
     });
 
     this.eventEmitter.on('keyboard:previous', () => {
@@ -21,7 +21,6 @@ export default class Display {
 
     this.eventEmitter.on('keyboard:select', () => {
       this.selectHighlightedTab();
-      this.deactivate();
     });
 
     this.eventEmitter.on('keyboard:cancel', () => {
@@ -32,6 +31,8 @@ export default class Display {
   }
 
   activate() {
+    if (this.active) return;
+
     this.getTabs(() => {
       this.render();
       this.highlightNextTab();
@@ -40,15 +41,16 @@ export default class Display {
   }
 
   deactivate() {
+    if (!this.active) return;
+
+    this.eventEmitter.emit('display:dactivate');
     document.body.removeChild(this.root);
     this.active = false;
     this.cursor = 0;
   }
 
   destroy() {
-    if (this.active) {
-      this.deactivate();
-    }
+    this.deactivate();
     this.eventEmitter = undefined;
     this.active = undefined;
     this.cursor = undefined;
@@ -64,22 +66,37 @@ export default class Display {
 
   highlightNextTab() {
     this.tabs[this.cursor].tabCon.classList.remove('TAS_highlighted');
-    if (this.cursor === this.tabs.length - 1) {
-      this.cursor = -1;
+    let searching = true;
+    let originalCursor = this.cursor;
+    while (searching) {
+      if (this.cursor === this.tabs.length - 1) {
+        this.cursor = -1;
+      }
+      if (this.tabs[++this.cursor].tabCon.style.display !== 'none' ||  this.cursor === originalCursor) {
+        searching = false;
+      }
     }
-    this.tabs[++this.cursor].tabCon.classList.add('TAS_highlighted');
+    this.tabs[this.cursor].tabCon.classList.add('TAS_highlighted');
   }
 
   highlightPreviousTab() {
     this.tabs[this.cursor].tabCon.classList.remove('TAS_highlighted');
-    if (this.cursor === 0) {
-      this.cursor = this.tabs.length;
+    let searching = true;
+    let originalCursor = this.cursor;
+    while (searching) {
+      if (this.cursor === 0) {
+        this.cursor = this.tabs.length;
+      }
+      if (this.tabs[--this.cursor].tabCon.style.display !== 'none' ||  this.cursor === originalCursor) {
+        searching = false;
+      }
     }
-    this.tabs[--this.cursor].tabCon.classList.add('TAS_highlighted');
+    this.tabs[this.cursor].tabCon.classList.add('TAS_highlighted');
   }
 
   selectHighlightedTab() {
     chrome.runtime.sendMessage({ selectTab: this.tabs[this.cursor] });
+    this.deactivate();
   }
 
   getTabs(cb) {
@@ -107,6 +124,14 @@ export default class Display {
     shadow.appendChild(displayCon);
     displayCon.appendChild(searchCon);
     searchCon.appendChild(searchInput);
+
+    searchInput.addEventListener('focus', () => {
+      this.eventEmitter.emit('display:search');
+    });
+
+    searchInput.addEventListener('input', () => {
+      this.filterTabs(searchInput.value);
+    });
 
     let l = this.tabs.length;
     for (let i = 0; i < l; i++) {
@@ -140,15 +165,29 @@ export default class Display {
 
       tabCon.addEventListener('click', () => {
         this.selectHighlightedTab();
-        this.deactivate();
-      });
-
-      searchInput.addEventListener('focus', () => {
-        // this.searchMode = true;
       });
 
       tab.cursor = i;
       tab.tabCon = tabCon;
     }
+  }
+
+  filterTabs(value) {
+    let firstMatch;
+    this.tabs.forEach((tab) => {
+      if (this.match(value, tab)) {
+        tab.tabCon.style.display = 'block';
+        if (!firstMatch) {
+          this.highlightTab(tab);
+          firstMatch = true;
+        }
+      } else {
+        tab.tabCon.style.display = 'none';
+      }
+    });
+  }
+
+  match(text, tab) {
+    return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text));
   }
 }
