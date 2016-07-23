@@ -7,7 +7,6 @@ export default class Keyboard {
     this.eventEmitter = eventEmitter;
     this.active = false;
     this.keys;
-
     this.keyBinder = new Mousetrap();
     this.activateKeyBinder = new Mousetrap();
 
@@ -15,7 +14,7 @@ export default class Keyboard {
       this.keyBinder.unbind(this.keys.modifier, 'keyup');
     });
 
-    this.eventEmitter.on('display:select', () => {
+    this.eventEmitter.on('display:deactivate', () => {
       this.deactivate();
     });
 
@@ -88,6 +87,16 @@ export default class Keyboard {
     this.active = false;
   }
 
+  destroy() {
+    this.deactivate();
+    this.activateKeyBinder.bind(this.keys.activate);
+    delete this.eventEmitter;
+    delete this.active;
+    delete this.keys;
+    delete this.keyBinder;
+    delete this.activateKeyBinder;
+  }
+
   bindKeyset(keyset, cb) {
     keyset.forEach((k) => {
       this.keyBinder.bind(k, cb);
@@ -98,13 +107,6 @@ export default class Keyboard {
     keyset.forEach((k) => {
       this.keyBinder.unbind(k);
     });
-  }
-
-  destroy() {
-    this.deactivate();
-    this.activateKeyBinder.bind(this.keys.activate);
-    this.eventEmitter = undefined;
-    this.keys = undefined;
   }
 
   initKeys(value) {

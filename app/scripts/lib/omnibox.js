@@ -1,4 +1,5 @@
 export default class Omnibox {
+  
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.tabs = [];
@@ -23,11 +24,9 @@ export default class Omnibox {
   suggest(text, suggest) {
     let suggestions = [];
     let matchedTabs = this.matchedTabs(text);
-    let l = matchedTabs.length;
-    for (let i = 0; i < l; i++) {
-      let tab = matchedTabs[i];
+    matchedTabs.forEach((tab) => {
       suggestions.push({ content: tab.url, description: 'tab: <match>' + this.encodeXml(tab.title) + '</match>' });
-    }
+    });
 
     if (suggestions.length > 0) {
       chrome.omnibox.setDefaultSuggestion({ description: suggestions[0].description });

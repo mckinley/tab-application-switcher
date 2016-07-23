@@ -46,7 +46,8 @@ export default class TabList {
   }
 
   destroy() {
-    this.tabs = undefined;
+    delete this.eventEmitter;
+    delete this.tabs;
   }
 
   getTabs() {
