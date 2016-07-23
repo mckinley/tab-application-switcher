@@ -6,6 +6,7 @@ export default class Keyboard {
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.active = false;
+    this.onReady;
     this.keys;
     this.keyBinder = new Mousetrap();
     this.activateKeyBinder = new Mousetrap();
@@ -31,6 +32,13 @@ export default class Keyboard {
     });
 
     chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy(); });
+  }
+
+  ready() {
+    if(this.onReady){
+      this.onReady(this);
+      delete this.onReady;
+    }
   }
 
   activate() {
@@ -89,9 +97,10 @@ export default class Keyboard {
 
   destroy() {
     this.deactivate();
-    this.activateKeyBinder.bind(this.keys.activate);
+    this.activateKeyBinder.unbind(this.keys.activate);
     delete this.eventEmitter;
     delete this.active;
+    delete this.onReady;
     delete this.keys;
     delete this.keyBinder;
     delete this.activateKeyBinder;
@@ -116,8 +125,8 @@ export default class Keyboard {
     let m = this.keys.modifier;
 
     k.activate = m + '+' + k.next;
-    k.next = [k.activate, m + '+' + 'right', 'right', m + '+' + 'down', 'down'];
-    k.previous = [m + '+' + k.previous, m + '+' + 'left', 'left', m + '+' + 'up', 'up'];
+    k.next = [k.activate, m + '+' + 'down', 'down'];
+    k.previous = [m + '+' + k.previous, m + '+' + 'up', 'up'];
     k.select = [m + '+' + 'enter', 'enter'];
     k.cancel = [m + '+' + 'esc', 'esc'];
 
@@ -126,6 +135,8 @@ export default class Keyboard {
       this.activate();
       return false;
     });
+
+    this.ready();
   }
 
   updateKeys(value) {

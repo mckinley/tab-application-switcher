@@ -44,7 +44,7 @@ export default class Display {
   deactivate() {
     if (!this.active) return;
 
-    this.eventEmitter.emit('display:dactivate');
+    this.eventEmitter.emit('display:deactivate');
     document.body.removeChild(this.root);
     this.cursor = undefined;
     this.root = undefined;
