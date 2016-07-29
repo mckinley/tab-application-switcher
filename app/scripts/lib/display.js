@@ -75,7 +75,7 @@ export default class Display {
       if (newCursor === this.tabs.length - 1) {
         newCursor = -1;
       }
-      if (this.tabs[++newCursor].tabCon.style.display !== 'none' ||  newCursor === originalCursor) {
+      if (this.tabs[++newCursor].tabCon.style.display !== 'none' || newCursor === originalCursor) {
         searching = false;
       }
     }
@@ -90,7 +90,7 @@ export default class Display {
       if (newCursor === 0) {
         newCursor = this.tabs.length;
       }
-      if (this.tabs[--newCursor].tabCon.style.display !== 'none' ||  newCursor === originalCursor) {
+      if (this.tabs[--newCursor].tabCon.style.display !== 'none' || newCursor === originalCursor) {
         searching = false;
       }
     }
@@ -109,6 +109,18 @@ export default class Display {
     });
   }
 
+  addStylesheet() {
+    let id = 'TAS_style';
+    let existingStyle = document.getElementById(id);
+    if (existingStyle) {
+      document.head.removeChild(existingStyle);
+    }
+    let style = document.createElement('style');
+    style.id = id;
+    style.appendChild(document.createTextNode('@import "' + chrome.extension.getURL('styles/main.css') + '";'));
+    document.head.appendChild(style);
+  }
+
   render() {
     this.root = document.createElement('div');
     var shadow = this.root.createShadowRoot();
@@ -117,6 +129,8 @@ export default class Display {
     let searchInput = document.createElement('input');
     searchInput.setAttribute('type', 'search');
     searchInput.setAttribute('placeholder', 'search page titles and urls');
+
+    this.addStylesheet();
 
     this.root.classList.add('TAS_root');
     displayCon.classList.add('TAS_displayCon');
@@ -128,7 +142,13 @@ export default class Display {
     displayCon.appendChild(searchCon);
     searchCon.appendChild(searchInput);
 
+    let searchIcon = '<svg class="TAS_searchIcon" viewBox="0 0 32 32" title=""><path d="M29.707,28.293l-8.256-8.256C23.042,18.13,24,15.677,24,13c0-6.075-4.925-11-11-11S2,6.925,2,13s4.925,11,11,11c2.677,0,5.13-0.958,7.037-2.549l8.256,8.256L29.707,28.293z M4,13c0-4.963,4.037-9,9-9c4.963,0,9,4.037,9,9s-4.037,9-9,9C8.037,22,4,17.963,4,13z"></path></svg>';
+    let temp = document.createElement('div');
+    temp.innerHTML = searchIcon;
+    searchCon.appendChild(temp.firstChild);
+
     searchInput.addEventListener('focus', () => {
+      console.log('focus');
       this.eventEmitter.emit('display:search');
     });
 

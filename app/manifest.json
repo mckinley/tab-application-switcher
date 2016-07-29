@@ -32,12 +32,10 @@
     ],
     "js": [
       "scripts/content.js"
-    ],
-    "css": [
-      "styles/main.css"
     ]
   }],
   "web_accessible_resources": [
+    "styles/main.css",
     "fonts/RobotoTTF/Roboto-Regular.ttf"
   ],
   "omnibox": {
