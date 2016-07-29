@@ -3,6 +3,7 @@ export default class Display {
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.active = false;
+    this.stylesheetId = 'TAS_style';
     this.cursor;
     this.root;
     this.tabs;
@@ -26,6 +27,8 @@ export default class Display {
     this.eventEmitter.on('keyboard:cancel', () => {
       this.deactivate();
     });
+
+    this.addStylesheet();
 
     chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy(); });
   }
@@ -54,8 +57,10 @@ export default class Display {
 
   destroy() {
     this.deactivate();
+    this.removeStylesheet();
     delete this.eventEmitter;
     delete this.active;
+    delete this.stylesheetId;
     delete this.cursor;
     delete this.root;
     delete this.tabs;
@@ -110,15 +115,17 @@ export default class Display {
   }
 
   addStylesheet() {
-    let id = 'TAS_style';
-    let existingStyle = document.getElementById(id);
+    let style = document.createElement('style');
+    style.id = this.stylesheetId;
+    style.appendChild(document.createTextNode('@import "' + chrome.extension.getURL('styles/main.css') + '";'));
+    document.head.appendChild(style);
+  }
+
+  removeStylesheet(){
+    let existingStyle = document.getElementById(this.stylesheetId);
     if (existingStyle) {
       document.head.removeChild(existingStyle);
     }
-    let style = document.createElement('style');
-    style.id = id;
-    style.appendChild(document.createTextNode('@import "' + chrome.extension.getURL('styles/main.css') + '";'));
-    document.head.appendChild(style);
   }
 
   render() {
@@ -129,8 +136,6 @@ export default class Display {
     let searchInput = document.createElement('input');
     searchInput.setAttribute('type', 'search');
     searchInput.setAttribute('placeholder', 'search page titles and urls');
-
-    this.addStylesheet();
 
     this.root.classList.add('TAS_root');
     displayCon.classList.add('TAS_displayCon');
@@ -148,7 +153,6 @@ export default class Display {
     searchCon.appendChild(temp.firstChild);
 
     searchInput.addEventListener('focus', () => {
-      console.log('focus');
       this.eventEmitter.emit('display:search');
     });
 
