@@ -19,15 +19,11 @@ export default class Connection {
   executeContentScripts() {
     let manifest = chrome.app.getDetails();
     let scripts = manifest.content_scripts[0].js;
-    let styles = manifest.content_scripts[0].css;
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
         if (!tab.url.match('chrome.google.com/webstore/category/extensions') && !tab.url.match('chrome://')) {
           scripts.forEach((script) => {
             chrome.tabs.executeScript(tab.id, { file: script, matchAboutBlank: true });
-          });
-          styles.forEach((style) => {
-            chrome.tabs.insertCSS(tab.id, { file: style, matchAboutBlank: true });
           });
         }
       });
