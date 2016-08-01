@@ -1,4 +1,4 @@
-export default class TabList {
+export default class Tabs {
 
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
@@ -70,7 +70,7 @@ export default class TabList {
         this.unshiftTab(focused.tabs.find((tab) => tab.active));
       }
 
-      this.eventEmitter.emit('tab-list:tabs', this.tabs);
+      this.eventEmitter.emit('tabs:tabs', this.tabs);
     });
   }
 

@@ -1,10 +1,10 @@
 export default class Omnibox {
-  
+
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.tabs = [];
 
-    this.eventEmitter.on('tab-list:tabs', (tabs) => { this.tabs = tabs; });
+    this.eventEmitter.on('tabs:tabs', (tabs) => { this.tabs = tabs; });
 
     chrome.omnibox.onInputChanged.addListener((text, suggest) => {
       this.suggest(text, suggest);

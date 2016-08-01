@@ -1,5 +1,5 @@
 import '~/test/helper';
-import subject from '~/app/scripts/lib/tab-list';
+import subject from '~/app/scripts/lib/tabs';
 
 describe('export', () => {
   it('should exist', () => {

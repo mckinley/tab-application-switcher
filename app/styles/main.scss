@@ -4,19 +4,11 @@ $font-name: 'Roboto';
   font-family: $font-name;
   src: url('chrome-extension://__MSG_@@extension_id__/fonts/RobotoTTF/Roboto-Regular.ttf');
 }
-.TAS_popup {
-  width: 408px;
-  height: 600px;
-  body {
-    height: 600px;
-    overflow: hidden;
-  }
-}
-.TAS_root {
+.TAS_displayCon {
   all: initial;
 }
-.TAS_root::shadow {
-  .TAS_displayCon {
+.TAS_displayCon::shadow {
+  .TAS_display {
     position: fixed;
     overflow: scroll;
     top: 0;
@@ -42,6 +34,7 @@ $font-name: 'Roboto';
   .TAS_searchCon {
     background-color: #f1f1f1;
     padding: 8px 8px 8px 0;
+    position: relative;
   }
   .TAS_searchIcon {
     width: 16px;
@@ -96,5 +89,13 @@ $font-name: 'Roboto';
     background-repeat: no-repeat;
     background-color: white;
     -webkit-border-radius: 2px;
+  }
+}
+.TAS_popup {
+  width: 408px;
+  height: 600px;
+  body {
+    height: 600px;
+    overflow: hidden;
   }
 }

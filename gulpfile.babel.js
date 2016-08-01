@@ -5,6 +5,7 @@ import glob from 'glob';
 import del from 'del';
 import ws from 'ws';
 import browserify from 'browserify';
+import hbsfy from 'hbsfy';
 import source from 'vinyl-source-stream';
 import eventStream from 'event-stream';
 import runSequence from 'run-sequence';
@@ -58,6 +59,7 @@ gulp.task('scripts', () => {
   let files = glob.sync('!(lib)', { cwd: 'app/scripts' });
   let tasks = files.map((file) => {
     return browserify('app/scripts/' + file, { debug: true })
+      .transform(hbsfy)
       .transform('babelify', { presets: ['es2015'] })
       .bundle().on('error', $.util.log)
       .pipe(source(file))
@@ -98,13 +100,13 @@ gulp.task('watch', () => {
   gulp.watch('app/_locales/**/*', () => { runSequence('locales', reload); });
   gulp.watch('app/**/*.html', () => { runSequence('html', reload); });
   gulp.watch('app/images/**/*', () => { runSequence('images', reload); });
-  gulp.watch('app/scripts/**/*', () => { runSequence('scripts', reload); });
+  gulp.watch(['app/scripts/**/*', 'app/templates/**/*'], () => { runSequence('scripts', reload); });
   gulp.watch('app/styles/**/*', () => { runSequence('styles', reload); });
 });
 
-gulp.task('dev', ['build', 'lint'], (cb) => {
+gulp.task('dev', ['build'], (cb) => {
   runSequence(['test', 'watch'], cb);
-  gulp.watch('app/scripts/**/*', ['lint', 'test']);
+  // gulp.watch('app/scripts/**/*', ['lint', 'test']);
   gulp.watch('test/**/*test.js', (file) => {
     gulp.src(file.path)
       .pipe($.eslint())

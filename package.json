@@ -8,6 +8,7 @@
     "babel-root-import": "^3.2.2",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
+    "browserify-handlebars": "^1.0.0",
     "chai": "^3.5.0",
     "del": "^2.2.0",
     "event-stream": "^3.3.2",
@@ -19,11 +20,14 @@
     "gulp-sass": "^2.2.0",
     "gulp-sourcemaps": "^2.0.0-alpha",
     "gulp-util": "^3.0.7",
+    "handlebars": "^4.0.5",
+    "hbsfy": "^2.7.0",
     "mocha": "^2.4.5",
     "mousetrap": "^1.5.3",
     "run-sequence": "^1.1.5",
     "sinon-chrome": "^1.1.2",
     "vinyl-source-stream": "^1.1.0",
     "ws": "^1.0.1"
-  }
+  },
+  "dependencies": {}
 }
