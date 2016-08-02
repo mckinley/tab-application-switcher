@@ -6,6 +6,10 @@ export default class Omnibox {
 
     this.eventEmitter.on('tabs:tabs', (tabs) => { this.tabs = tabs; });
 
+    chrome.omnibox.onInputStarted.addListener(() => {
+      this.getTabs();
+    });
+
     chrome.omnibox.onInputChanged.addListener((text, suggest) => {
       this.suggest(text, suggest);
     });
@@ -18,6 +22,12 @@ export default class Omnibox {
       if (tab) {
         this.eventEmitter.emit('omnibox:select-tab', tab);
       }
+    });
+  }
+
+  getTabs() {
+    chrome.runtime.sendMessage({ tabs: true }, (response) => {
+      this.tabs = response.tabs;
     });
   }
 
