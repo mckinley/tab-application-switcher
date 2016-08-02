@@ -1,4 +1,4 @@
-import defaultOptions from './default-options.json';
+import defaultOptions from './../default-options.json';
 import template from '~/app/templates/options.hbs';
 
 export default class Options {

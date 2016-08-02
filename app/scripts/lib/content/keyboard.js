@@ -1,4 +1,4 @@
-import defaultOptions from './default-options.json';
+import defaultOptions from './../default-options.json';
 import Mousetrap from 'mousetrap';
 
 export default class Keyboard {
