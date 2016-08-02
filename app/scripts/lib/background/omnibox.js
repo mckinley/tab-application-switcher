@@ -4,10 +4,9 @@ export default class Omnibox {
     this.eventEmitter = eventEmitter;
     this.tabs = [];
 
-    this.eventEmitter.on('tabs:tabs', (tabs) => { this.tabs = tabs; });
-
     chrome.omnibox.onInputStarted.addListener(() => {
       this.getTabs();
+      console.log('asdf');
     });
 
     chrome.omnibox.onInputChanged.addListener((text, suggest) => {
@@ -54,13 +53,11 @@ export default class Omnibox {
 
   matchedTabs(text) {
     let matchedTabs = [];
-    let l = this.tabs.length;
-    for (let i = 0; i < l; i++) {
-      let tab = this.tabs[i];
+    this.tabs.forEach((tab) => {
       if (this.match(text, tab)) {
         matchedTabs.push(tab);
       }
-    }
+    });
     return matchedTabs;
   }
 

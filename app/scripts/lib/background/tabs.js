@@ -69,8 +69,6 @@ export default class Tabs {
         this.tabs = focused.tabs.concat(this.tabs);
         this.unshiftTab(focused.tabs.find((tab) => tab.active));
       }
-
-      this.eventEmitter.emit('tabs:tabs', this.tabs);
     });
   }
 

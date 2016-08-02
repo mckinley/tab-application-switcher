@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import Options from './lib/options';
+import Options from './lib/content/options';
 
 let eventEmitter = new EventEmitter();
 let options = new Options(eventEmitter);
