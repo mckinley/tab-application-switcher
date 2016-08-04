@@ -67,7 +67,7 @@ export default class List {
         id: tab.id,
         title: tab.title,
         url: tab.url,
-        faviconUrl: (tab.favIconUrl.indexOf('chrome://theme/') !== 0 ? tab.favIconUrl : '')
+        faviconUrl: (tab.favIconUrl && tab.favIconUrl.indexOf('chrome://theme/') !== 0 ? tab.favIconUrl : '')
       };
     });
   }

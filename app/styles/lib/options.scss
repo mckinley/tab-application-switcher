@@ -1,0 +1,54 @@
+.TAS_options {
+  position: relative;
+  background-color: #404040;
+  text-align: center;
+
+  .TAS_keys {
+    padding: 14px;
+  }
+  .TAS_keyCon {
+    display: inline-block;
+    width: 70px;
+    vertical-align: top;
+  }
+  .TAS_key {
+    display: inline-block;
+    width: 30px;
+    line-height: 30px;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
+    background: #fff;
+    vertical-align: middle;
+    color: #404040;
+    cursor: pointer;
+  }
+  .TAS_label {
+    padding-top: 6px;
+    color: #e3e3e3;
+  }
+  .TAS_saveCon {
+    display: inline-block;
+    width: 100px;
+    vertical-align: top;
+  }
+  .TAS_save {
+    display: inline-block;
+    width: 60px;
+    line-height: 30px;
+    border-radius: 15px;
+    margin-left: 8px;
+    background: #e3e3e3;
+    color: #404040;
+    cursor: pointer;
+  }
+  .TAS_status {
+    opacity: 0;
+    transition: opacity 0.8s;
+    padding-top: 6px;
+    color: #e3e3e3;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+}

@@ -10,6 +10,8 @@ export default class Display {
     this.active = false;
     this.stylesheetId = 'TAS_style';
     this.root;
+    this.shadowRoot;
+    this.options;
     this.tabs;
 
     this.eventEmitter.on('keyboard:activate', () => {
@@ -44,6 +46,8 @@ export default class Display {
     this.eventEmitter.emit('display:deactivate');
     document.body.removeChild(this.root);
     this.root = undefined;
+    this.shadowRoot = undefined;
+    this.options = undefined;
     this.tabs = undefined;
     this.active = false;
   }
@@ -55,6 +59,8 @@ export default class Display {
     delete this.active;
     delete this.stylesheetId;
     delete this.root;
+    delete this.shadowRoot;
+    delete this.options;
     delete this.tabs;
   }
 
@@ -79,6 +85,42 @@ export default class Display {
     }
   }
 
+  toggleOptions() {
+    if (this.options && this.options.active) {
+      this.deactivateOptions();
+    } else {
+      this.activateOptions();
+    }
+  }
+
+  activateOptions() {
+    if (this.options && this.options.active) return;
+
+    let element = this.shadowRoot.querySelector('.TAS_optionsCon');
+    element.classList.add('active');
+    let icon = this.shadowRoot.querySelector('.TAS_optionsIcon');
+    icon.classList.add('active');
+
+    if (!this.options) {
+      this.options = new Options(this.eventEmitter);
+      element.appendChild(this.options.render());
+    } else {
+      this.options.activate();
+    }
+
+    this.eventEmitter.emit('display:options');
+  }
+
+  deactivateOptions() {
+    if (!this.options.active) return;
+
+    let element = this.shadowRoot.querySelector('.TAS_optionsCon');
+    element.classList.remove('active');
+    let icon = this.shadowRoot.querySelector('.TAS_optionsIcon');
+    icon.classList.remove('active');
+    this.options.deactivate();
+  }
+
   render() {
     this.root = document.createElement('div');
     this.root.classList.add('TAS_displayCon');
@@ -96,7 +138,10 @@ export default class Display {
     let search = new Search(this.eventEmitter, this.tabs, list);
     shadow.querySelector('.TAS_searchCon').appendChild(search.render());
 
-    let options = new Options(this.eventEmitter);
-    shadow.querySelector('.TAS_optionsCon').appendChild(options.render());
+    shadow.querySelector('.TAS_optionsControl').addEventListener('click', () => {
+      this.toggleOptions();
+    });
+
+    this.shadowRoot = shadow;
   }
 }

@@ -1,18 +1,35 @@
 import defaultOptions from './../default-options.json';
 import template from '~/app/templates/options.hbs';
+import characterFromEvent from 'combokeys/helpers/characterFromEvent';
 
 export default class Options {
 
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
+    this.active = false;
+    this.keyListener;
+    this.recordingElement;
     this.root;
   }
 
+  activate() {
+    if (this.active) return;
+
+    this.active = true;
+  }
+
+  deactivate() {
+    if (!this.active) return;
+
+    this.recordKeyStop();
+    this.active = false;
+  }
+
   save() {
-    let keyModifier = this.root.querySelector('#key-modifier').value;
-    let keyNext = this.root.querySelector('#key-next').value;
-    let keyPrevious = this.root.querySelector('#key-previous').value;
-    let status = this.root.querySelector('#status');
+    let keyModifier = this.root.querySelector('.TAS_keyModifier').textContent;
+    let keyNext = this.root.querySelector('.TAS_keyNext').textContent;
+    let keyPrevious = this.root.querySelector('.TAS_keyPrevious').textContent;
+    let status = this.root.querySelector('.TAS_status');
     chrome.storage.sync.set({
       keys: {
         modifier: keyModifier,
@@ -20,25 +37,60 @@ export default class Options {
         previous: keyPrevious
       }
     }, () => {
-      status.textContent = 'Options saved.';
-      setTimeout(function() {
-        status.textContent = '';
-      }, 2000);
+      status.textContent = 'options saved';
+      status.classList.add('active');
+      setTimeout(() => {
+        status.classList.remove('active');
+      }, 3000);
     });
+  }
+
+  recordKeyStart(element) {
+    this.recordingElement = element;
+    document.removeEventListener('keydown', this.keyListener);
+    document.addEventListener('keydown', this.keyListener);
+  }
+
+  recordKeyStop() {
+    document.removeEventListener('keydown', this.keyListener);
+    this.recordingElement = undefined;
   }
 
   render() {
     this.root = document.createElement('div');
     this.root.classList.add('TAS_options');
-    this.root.innerHTML = template();
 
     chrome.storage.sync.get(defaultOptions, (storage) => {
-      this.root.querySelector('#key-modifier').value = storage.keys.modifier;
-      this.root.querySelector('#key-next').value = storage.keys.next;
-      this.root.querySelector('#key-previous').value = storage.keys.previous;
-    });
-    this.root.querySelector('#save').addEventListener('click', () => {
-      this.save();
+      this.root.innerHTML = template({ modifier: storage.keys.modifier, next: storage.keys.next, previous: storage.keys.previous });
+
+      this.keyListener = (event) => {
+        console.log('listen');
+        event.preventDefault();
+        this.recordingElement.textContent = characterFromEvent(event);
+        this.recordKeyStop();
+      };
+
+      let keyModifier = this.root.querySelector('.TAS_keyModifier');
+      keyModifier.addEventListener('click', () => {
+        this.recordKeyStart(keyModifier);
+      });
+
+      let keyNext = this.root.querySelector('.TAS_keyNext');
+      keyNext.addEventListener('click', () => {
+        this.recordKeyStart(keyNext);
+      });
+
+      let keyPrevious = this.root.querySelector('.TAS_keyPrevious');
+      keyPrevious.addEventListener('click', () => {
+        this.recordKeyStart(keyPrevious);
+      });
+
+      let save = this.root.querySelector('.TAS_save');
+      save.addEventListener('click', () => {
+        this.save();
+      });
+
+      this.activate();
     });
 
     return this.root;

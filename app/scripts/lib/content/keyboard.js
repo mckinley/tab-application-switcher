@@ -1,5 +1,6 @@
 import defaultOptions from './../default-options.json';
-import Mousetrap from 'mousetrap';
+// import Mousetrap from 'mousetrap';
+import Combokeys from 'combokeys';
 
 export default class Keyboard {
 
@@ -8,10 +9,14 @@ export default class Keyboard {
     this.active = false;
     this.onReady;
     this.keys;
-    this.keyBinder = new Mousetrap();
-    this.activateKeyBinder = new Mousetrap();
+    this.keyBinder = new Combokeys(document);
+    this.activateKeyBinder = new Combokeys(document);
 
     this.eventEmitter.on('display:search', () => {
+      this.keyBinder.unbind(this.keys.modifier, 'keyup');
+    });
+
+    this.eventEmitter.on('display:options', () => {
       this.keyBinder.unbind(this.keys.modifier, 'keyup');
     });
 

@@ -106,7 +106,7 @@ gulp.task('watch', () => {
 
 gulp.task('dev', ['build'], (cb) => {
   runSequence(['test', 'watch'], cb);
-  // gulp.watch('app/scripts/**/*', ['lint', 'test']);
+  gulp.watch('app/scripts/**/*', ['lint', 'test']);
   gulp.watch('test/**/*test.js', (file) => {
     gulp.src(file.path)
       .pipe($.eslint())

@@ -6,7 +6,6 @@ export default class Omnibox {
 
     chrome.omnibox.onInputStarted.addListener(() => {
       this.getTabs();
-      console.log('asdf');
     });
 
     chrome.omnibox.onInputChanged.addListener((text, suggest) => {

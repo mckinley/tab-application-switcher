@@ -1,0 +1,33 @@
+.TAS_searchCon {
+  background-color: #f1f1f1;
+  padding: 8px 18px 8px 0;
+  position: relative;
+
+  .TAS_searchIcon {
+    width: 16px;
+    height: 16px;
+    fill: #333;
+    position: absolute;
+    top: 26px;
+    left: 20px;
+  }
+  .TAS_searchInput {
+    -webkit-appearance: none;
+    border: 0;
+    width: 100%;
+    outline: 0 !important;
+    font-size: 12px;
+    height: 50px;
+    margin: 0;
+    padding: 0 10px 0 26px;
+    border: solid 8px #f1f1f1;
+    border-radius: 25px;
+    &::-webkit-input-placeholder {
+      color: #a1a1a1;
+      padding-left: 4px;
+    }
+    &:focus {
+      color: #333;
+    }
+  }
+}

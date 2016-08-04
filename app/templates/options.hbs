@@ -1,24 +1,21 @@
-<h1>Options</h1>
-
-<form class="form" action="index.html" method="post">
-  <div class="form-field">
-    <label for="key-modifier">
-      <input type="text" id="key-modifier">
-    </label>
+<div class="TAS_keys">
+  <div class="TAS_keyCon">
+    <div class="TAS_keyModifier TAS_key">{{modifier}}</div>
+    <div class="TAS_label">modifier</div>
   </div>
 
-  <div class="form-field">
-    <label for="key-next">
-      <input type="text" id="key-next">
-    </label>
+  <div class="TAS_keyCon">
+    <div class="TAS_keyNext TAS_key">{{next}}</div>
+    <div class="TAS_label">next</div>
   </div>
 
-  <div class="form-field">
-    <label for="key-previous">
-      <input type="text" id="key-previous">
-    </label>
+  <div class="TAS_keyCon">
+    <div class="TAS_keyPrevious TAS_key">{{previous}}</div>
+    <div class="TAS_label">previous</div>
   </div>
-</form>
 
-<div id="status"></div>
-<button id="save">Save</button>
+  <div class="TAS_saveCon">
+    <div class="TAS_save">Save</div>
+    <div class="TAS_status"></div>
+  </div>
+</div>

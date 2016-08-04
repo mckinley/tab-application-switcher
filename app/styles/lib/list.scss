@@ -1,0 +1,40 @@
+.TAS_listCon {
+  .TAS_tabCon {
+    position: relative;
+    border-bottom: solid 1px #f1f1f1;
+    border-top: solid 1px white;
+    background-color: white;
+    cursor: pointer;
+    height: 32px;
+    white-space: nowrap;
+    padding: 0 10px 0 30px;
+
+    &.TAS_highlighted {
+      background-color: #f1f1f1;
+      padding-right: 0;
+      border-right: solid 10px #d4d4d4;
+      border-top: solid 1px #e3e3e3;
+      border-bottom: solid 1px #e3e3e3;
+    }
+    &.TAS_highlighted .TAS_tabTitle {
+      color: #333;
+    }
+    .TAS_tabTitle {
+      overflow: hidden;
+      line-height: 32px;
+      vertical-align: middle;
+    }
+    .TAS_tabIcon {
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      top: 8px;
+      left: 8px;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: white;
+      -webkit-border-radius: 2px;
+    }
+  }
+}
