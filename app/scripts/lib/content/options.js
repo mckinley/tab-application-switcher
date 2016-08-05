@@ -47,12 +47,14 @@ export default class Options {
 
   recordKeyStart(element) {
     this.recordingElement = element;
+    this.recordingElement.classList.add('recording');
     document.removeEventListener('keydown', this.keyListener);
     document.addEventListener('keydown', this.keyListener);
   }
 
   recordKeyStop() {
     document.removeEventListener('keydown', this.keyListener);
+    this.recordingElement.classList.remove('recording');
     this.recordingElement = undefined;
   }
 
