@@ -30,6 +30,7 @@
       "http://*/*",
       "https://*/*"
     ],
+    "match_about_blank" : true,
     "js": [
       "scripts/content.js"
     ]

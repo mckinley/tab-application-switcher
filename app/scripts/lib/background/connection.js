@@ -1,19 +1,11 @@
 export default class Connection {
 
   constructor() {
-    let port = chrome.runtime.connect();
-    port.onDisconnect.addListener(() => {
-      this.destroy();
-    });
     // Required for onDisconnect in content scripts to execute only when reload occurs.
     // Without a listener, onDesconnect is called immediatly.
     chrome.runtime.onConnect.addListener(() => {});
 
     this.executeContentScripts();
-  }
-
-  destroy() {
-    chrome.runtime.sendMessage({ connection: 'disconnect' });
   }
 
   executeContentScripts() {

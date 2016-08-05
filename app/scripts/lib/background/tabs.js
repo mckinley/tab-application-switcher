@@ -40,18 +40,7 @@ export default class Tabs {
       this.unshiftTab(this.findTab(info.tabId));
     });
 
-    chrome.runtime.onMessage.addListener((request, sender, _sendResponse) => {
-      if (request.connection === 'disconnect') {
-        this.destroy();
-      }
-    });
-
     this.getTabs();
-  }
-
-  destroy() {
-    delete this.eventEmitter;
-    delete this.tabs;
   }
 
   getTabs() {
