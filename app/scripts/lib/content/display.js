@@ -138,6 +138,10 @@ export default class Display {
     let search = new Search(this.eventEmitter, this.tabs, list);
     shadow.querySelector('.TAS_searchCon').appendChild(search.render());
 
+    shadow.querySelector('.TAS_displayControlClose').addEventListener('click', () => {
+      this.deactivate();
+    });
+
     shadow.querySelector('.TAS_optionsControl').addEventListener('click', () => {
       this.toggleOptions();
     });

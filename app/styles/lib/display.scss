@@ -25,17 +25,31 @@
       font-size: 12px;
       font-family: $font-name, sans-serif;
 
-      .TAS_optionsControl {
+      .TAS_displayControlClose {
         position: absolute;
         right: 0;
         top: 0;
         z-index: 10;
         padding: 6px;
+        cursor: pointer;
+      }
+      .TAS_displayIconClose {
+        width: 16px;
+        height: 16px;
+        fill: #d4d4d4;
+      }
+      .TAS_optionsControl {
+        position: absolute;
+        right: 0;
+        top: 36px;
+        z-index: 10;
+        padding: 6px;
+        cursor: pointer;
       }
       .TAS_optionsIcon {
         width: 16px;
         height: 16px;
-        fill: #696969;
+        fill: #d4d4d4;
         transition: fill 1s;
         &.active {
           fill: #fcfcfc;
@@ -48,7 +62,6 @@
         transition: height 0.5s;
         right: 0;
         top: 0;
-        cursor: pointer;
 
         &.active {
           height: 80px;

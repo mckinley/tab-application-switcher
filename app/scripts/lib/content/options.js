@@ -64,7 +64,6 @@ export default class Options {
       this.root.innerHTML = template({ modifier: storage.keys.modifier, next: storage.keys.next, previous: storage.keys.previous });
 
       this.keyListener = (event) => {
-        console.log('listen');
         event.preventDefault();
         this.recordingElement.textContent = characterFromEvent(event);
         this.recordKeyStop();
