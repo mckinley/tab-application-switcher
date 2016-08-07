@@ -1,5 +1,4 @@
 import defaultOptions from './../default-options.json';
-// import Mousetrap from 'mousetrap';
 import Combokeys from 'combokeys';
 
 export default class Keyboard {

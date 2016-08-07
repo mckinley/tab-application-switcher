@@ -10,8 +10,21 @@ import source from 'vinyl-source-stream';
 import eventStream from 'event-stream';
 import runSequence from 'run-sequence';
 import gulpLoadPlugins from 'gulp-load-plugins';
+import through from 'through2';
 
 const $ = gulpLoadPlugins();
+
+let errorHandler = $.notify.onError({
+  title: 'Gulp Error',
+  message: 'Error: <%= error.message %>',
+  sound: 'Bottle'
+});
+
+let originalGulpSrc = gulp.src;
+gulp.src = function() {
+  return originalGulpSrc.apply(gulp, arguments)
+    .pipe($.plumber({ errorHandler: errorHandler }));
+};
 
 gulp.task('clean', () => {
   return del(['dist/*'], { dot: true });
@@ -58,10 +71,20 @@ gulp.task('format', ['lint'], () => {
 gulp.task('scripts', () => {
   let files = glob.sync('!(lib)', { cwd: 'app/scripts' });
   let tasks = files.map((file) => {
-    return browserify('app/scripts/' + file, { debug: true })
+    return browserify('app/scripts/' + file, { debug: $.util.env.type !== 'prod' })
+      .transform(() => {
+        if ($.util.env.type === 'prod') {
+          return through(function(buf, enc, next) {
+            this.push(buf.toString('utf8').replace(/^.*\/\/\s*dev$/gm, '')); // remove all lines that end in '// dev'
+            next();
+          });
+        } else {
+          return $.util.noop();
+        }
+      })
       .transform(hbsfy)
       .transform('babelify', { presets: ['es2015'] })
-      .bundle().on('error', $.util.log)
+      .bundle().on('error', errorHandler)
       .pipe(source(file))
       .pipe(gulp.dest('dist/scripts'));
   });
@@ -71,7 +94,7 @@ gulp.task('scripts', () => {
 gulp.task('styles', () => {
   return gulp.src('app/styles/!(lib)')
     .pipe($.sourcemaps.init())
-    .pipe($.sass({ includePaths: 'node_modules' }).on('error', $.sass.logError))
+    .pipe($.sass({ includePaths: 'node_modules' }))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('dist/styles'));
 });
@@ -81,18 +104,26 @@ gulp.task('test', () => {
     .pipe($.mocha());
 });
 
+gulp.task('package', ['lint', 'test', 'build'], () => {
+  $.util.env.type = 'prod';
+  let manifest = require('./dist/manifest.json');
+  return gulp.src('dist/**')
+    .pipe($.zip('tab-application-switcher-' + manifest.version + '.zip'))
+    .pipe(gulp.dest('package'));
+});
+
 gulp.task('watch', () => {
   let server = new ws.Server({ port: 5454 });
 
-  let connection;
+  let reloader;
   server.on('connection', (ws) => {
-    connection = ws;
+    reloader = ws;
   });
 
   function reload() {
     $.util.log('-- reload');
-    if (connection) {
-      connection.send('reload-extension', $.util.log);
+    if (reloader) {
+      reloader.send('reload-extension', $.util.log);
     }
   }
 
