@@ -37,8 +37,12 @@ export default class Search {
     searchInput.addEventListener('focus', () => {
       this.eventEmitter.emit('display:search');
     });
-    searchInput.addEventListener('input', () => {
+    searchInput.addEventListener('input', (event) => {
+      event.stopPropagation();
       this.filterTabs(searchInput.value);
+    });
+    searchInput.addEventListener('keydown', (event) => {
+      event.stopPropagation();
     });
 
     return this.root;

@@ -49,12 +49,12 @@ export default class Options {
     this.recordKeyStop();
     this.recordingElement = element;
     this.recordingElement.classList.add('recording');
-    document.addEventListener('keydown', this.keyListener);
+    this.recordingElement.addEventListener('keydown', this.keyListener);
   }
 
   recordKeyStop() {
     if (!this.recordingElement) return;
-    document.removeEventListener('keydown', this.keyListener);
+    this.recordingElement.removeEventListener('keydown', this.keyListener);
     this.recordingElement.classList.remove('recording');
     this.recordingElement = undefined;
   }
@@ -67,7 +67,7 @@ export default class Options {
       this.root.innerHTML = template({ modifier: storage.keys.modifier, next: storage.keys.next, previous: storage.keys.previous });
 
       this.keyListener = (event) => {
-        event.preventDefault();
+        event.stopPropagation();
         this.recordingElement.textContent = characterFromEvent(event);
         this.recordKeyStop();
       };

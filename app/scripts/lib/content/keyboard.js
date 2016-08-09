@@ -49,31 +49,31 @@ export default class Keyboard {
     if (this.active) return;
 
     this.bindKeyset(this.keys.next, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:next');
-      return false;
     });
 
     this.bindKeyset(this.keys.previous, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:previous');
-      return false;
     });
 
     this.bindKeyset(this.keys.select, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:select');
       this.deactivate();
-      return false;
     });
 
     this.bindKeyset(this.keys.cancel, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:cancel');
       this.deactivate();
-      return false;
     });
 
     this.keyBinder.bind(this.keys.modifier, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:select');
       this.deactivate();
-      return false;
     }, 'keyup');
 
     this.activateKeyBinder.unbind(this.keys.activate);
@@ -91,9 +91,9 @@ export default class Keyboard {
     this.keyBinder.unbind(this.keys.modifier, 'keyup');
 
     this.activateKeyBinder.bind(this.keys.activate, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:activate');
       this.activate();
-      return false;
     });
 
     this.active = false;
@@ -135,9 +135,9 @@ export default class Keyboard {
     k.cancel = [m + '+' + 'esc', 'esc'];
 
     this.activateKeyBinder.bind(k.activate, () => {
+      event.stopPropagation();
       this.eventEmitter.emit('keyboard:activate');
       this.activate();
-      return false;
     });
 
     this.ready();
