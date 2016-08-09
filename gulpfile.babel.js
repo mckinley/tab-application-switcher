@@ -104,7 +104,7 @@ gulp.task('test', () => {
     .pipe($.mocha());
 });
 
-gulp.task('package', ['lint', 'test', 'build'], () => {
+gulp.task('package', ['lint', 'test', 'clean', 'build'], () => {
   $.util.env.type = 'prod';
   let manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
