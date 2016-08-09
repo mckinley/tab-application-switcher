@@ -13,7 +13,7 @@ export default class Connection {
     let scripts = manifest.content_scripts[0].js;
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
-        if (!tab.url.match('chrome.google.com/webstore/category/extensions') && !tab.url.match('chrome://')) {
+        if (!tab.url.match('chrome.google.com/webstore') && !tab.url.match('chrome://')) {
           scripts.forEach((script) => {
             chrome.tabs.executeScript(tab.id, { file: script, matchAboutBlank: true });
           });
