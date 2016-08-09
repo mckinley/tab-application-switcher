@@ -64,7 +64,15 @@ export default class Options {
     this.root.classList.add('TAS_options');
 
     chrome.storage.sync.get(defaultOptions, (storage) => {
-      this.root.innerHTML = template({ modifier: storage.keys.modifier, next: storage.keys.next, previous: storage.keys.previous });
+      this.root.innerHTML = template({
+        modifier: chrome.i18n.getMessage('modifier'),
+        next: chrome.i18n.getMessage('next'),
+        previous: chrome.i18n.getMessage('previous'),
+        save: chrome.i18n.getMessage('save'),
+        modifierKey: storage.keys.modifier,
+        nextKey: storage.keys.next,
+        previousKey: storage.keys.previous
+      });
 
       this.keyListener = (event) => {
         event.stopPropagation();

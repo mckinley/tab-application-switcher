@@ -1,10 +1,23 @@
 {
   "app_name": {
-    "message": "Tab Application Switcher",
-    "description": "The name of the application"
+    "message": "Tab Application Switcher"
+  },
+  "app_short_name": {
+    "message": "Tab Application Switcher"
   },
   "app_description": {
-    "message": "Application switcher for Chrome tabs",
-    "description": "The description of the application"
+    "message": "Application switcher for Chrome tabs"
+  },
+  "modifier": {
+    "message": "modifier"
+  },
+  "next": {
+    "message": "next"
+  },
+  "previous": {
+    "message": "previous"
+  },
+  "save": {
+    "message": "Save"
   }
 }
