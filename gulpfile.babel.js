@@ -104,8 +104,12 @@ gulp.task('test', () => {
     .pipe($.mocha());
 });
 
-gulp.task('package', ['lint', 'test', 'clean', 'build'], () => {
+gulp.task('package', ['clean', 'lint', 'test'], (cb) => {
   $.util.env.type = 'prod';
+  runSequence('build', 'zip', cb);
+});
+
+gulp.task('zip', () => {
   let manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
     .pipe($.zip('tab-application-switcher-' + manifest.version + '.zip'))
