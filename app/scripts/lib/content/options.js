@@ -26,6 +26,7 @@ export default class Options {
   }
 
   save() {
+    this.recordKeyStop();
     let keyModifier = this.root.querySelector('.TAS_keyModifier').textContent;
     let keyNext = this.root.querySelector('.TAS_keyNext').textContent;
     let keyPrevious = this.root.querySelector('.TAS_keyPrevious').textContent;
@@ -75,9 +76,9 @@ export default class Options {
       });
 
       this.keyListener = (event) => {
-        event.stopPropagation();
         this.recordingElement.textContent = characterFromEvent(event);
         this.recordKeyStop();
+        return false;
       };
 
       let keyModifier = this.root.querySelector('.TAS_keyModifier');
