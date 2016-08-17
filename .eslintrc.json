@@ -8,8 +8,9 @@
   },
   "extends": "eslint:recommended",
   "globals": {
-    "chrome": false,
-    "expect": false
+    "expect": false,
+    "sinon": false,
+    "chrome": false
   },
   "parser": "babel-eslint",
   "rules": {

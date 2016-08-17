@@ -10,6 +10,7 @@ export default class Options {
     this.keyListener;
     this.recordingElement;
     this.root;
+    this.os = navigator.platform.indexOf('Mac') > -1 ? 'mac' : 'windows';
   }
 
   activate() {
@@ -25,19 +26,26 @@ export default class Options {
     this.active = false;
   }
 
-  save() {
-    this.recordKeyStop();
+  storageObject() {
     let keyModifier = this.root.querySelector('.TAS_keyModifier').textContent;
     let keyNext = this.root.querySelector('.TAS_keyNext').textContent;
     let keyPrevious = this.root.querySelector('.TAS_keyPrevious').textContent;
+    let options = {
+      modifier: keyModifier,
+      next: keyNext,
+      previous: keyPrevious
+    };
+
+    let storage = { keys: {} };
+    storage.keys[this.os] = options;
+
+    return storage;
+  }
+
+  save() {
     let status = this.root.querySelector('.TAS_status');
-    chrome.storage.sync.set({
-      keys: {
-        modifier: keyModifier,
-        next: keyNext,
-        previous: keyPrevious
-      }
-    }, () => {
+    this.recordKeyStop();
+    chrome.storage.sync.set(this.storageObject(), () => {
       status.textContent = 'options saved';
       status.classList.add('active');
       setTimeout(() => {
@@ -65,14 +73,15 @@ export default class Options {
     this.root.classList.add('TAS_options');
 
     chrome.storage.sync.get(defaultOptions, (storage) => {
+      let keys = storage.keys[this.os];
       this.root.innerHTML = template({
         modifier: chrome.i18n.getMessage('modifier'),
         next: chrome.i18n.getMessage('next'),
         previous: chrome.i18n.getMessage('previous'),
         save: chrome.i18n.getMessage('save'),
-        modifierKey: storage.keys.modifier,
-        nextKey: storage.keys.next,
-        previousKey: storage.keys.previous
+        modifierKey: keys.modifier,
+        nextKey: keys.next,
+        previousKey: keys.previous
       });
 
       this.keyListener = (event) => {

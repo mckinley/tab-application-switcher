@@ -123,7 +123,8 @@ export default class Keyboard {
   }
 
   initKeys(value) {
-    this.keys = value;
+    let os = navigator.platform.indexOf('Mac') > -1 ? 'mac' : 'windows';
+    this.keys = value[os];
 
     let k = this.keys;
     let m = this.keys.modifier;

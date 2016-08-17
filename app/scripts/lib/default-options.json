@@ -1,7 +1,14 @@
 {
   "keys": {
-    "modifier": "alt",
-    "next": "tab",
-    "previous": "`"
+    "mac": {
+      "modifier": "alt",
+      "next": "tab",
+      "previous": "`"
+    },
+    "windows": {
+      "modifier": "meta",
+      "next": "tab",
+      "previous": "`"
+    }
   }
 }
