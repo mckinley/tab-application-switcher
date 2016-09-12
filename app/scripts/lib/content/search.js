@@ -2,11 +2,11 @@ import template from '~/app/templates/search.hbs';
 
 export default class Search {
 
-  constructor(eventEmitter, tabs, list) {
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
-    this.tabs = tabs;
-    this.list = list;
     this.root;
+    this.tabs;
+    this.list;
   }
 
   filterTabs(value) {
@@ -28,7 +28,10 @@ export default class Search {
     return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text));
   }
 
-  render() {
+  render(tabs, list) {
+    this.tabs = tabs;
+    this.list = list;
+
     this.root = document.createElement('div');
     this.root.classList.add('TAS_search');
     this.root.innerHTML = template();
@@ -42,7 +45,14 @@ export default class Search {
       this.filterTabs(searchInput.value);
     });
     searchInput.addEventListener('keydown', (event) => {
-      event.stopPropagation();
+      if (event.keyCode === 38 || event.keyCode === 40 || event.keyCode === 13 || (searchInput.value === '' && event.keyCode === 27)) {
+        // (38) let up arrow pass through
+        // (40) let down arrow pass through
+        // (13) let enter pass through
+        // (27) let escape pass through if the input is empty
+      } else {
+        event.stopPropagation();
+      }
     });
 
     return this.root;

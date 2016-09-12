@@ -14,11 +14,18 @@ export default class Display {
     this.options;
     this.tabs;
 
+    this.list = new List(this.eventEmitter);
+    this.search = new Search(this.eventEmitter);
+
     this.eventEmitter.on('keyboard:activate', () => {
       this.activate();
     });
 
     this.eventEmitter.on('keyboard:select', () => {
+      this.deactivate();
+    });
+
+    this.eventEmitter.on('list:select', () => {
       this.deactivate();
     });
 
@@ -45,6 +52,7 @@ export default class Display {
 
     this.eventEmitter.emit('display:deactivate');
     document.body.removeChild(this.root);
+    this.list.deactivate();
     this.root = undefined;
     this.shadowRoot = undefined;
     this.options = undefined;
@@ -121,10 +129,14 @@ export default class Display {
     this.options.deactivate();
   }
 
+  shadow() {
+    return this.root.createShadowRoot();
+  }
+
   render() {
     this.root = document.createElement('div');
     this.root.classList.add('TAS_displayCon');
-    let shadow = this.root.createShadowRoot();
+    let shadow = this.shadow();
     document.body.appendChild(this.root);
 
     let root = document.createElement('div');
@@ -132,11 +144,8 @@ export default class Display {
     root.innerHTML = template();
     shadow.appendChild(root);
 
-    let list = new List(this.eventEmitter, this.tabs);
-    shadow.querySelector('.TAS_listCon').appendChild(list.render());
-
-    let search = new Search(this.eventEmitter, this.tabs, list);
-    shadow.querySelector('.TAS_searchCon').appendChild(search.render());
+    shadow.querySelector('.TAS_listCon').appendChild(this.list.render(this.tabs));
+    shadow.querySelector('.TAS_searchCon').appendChild(this.search.render(this.tabs, this.list));
 
     shadow.querySelector('.TAS_displayControlClose').addEventListener('click', () => {
       this.deactivate();

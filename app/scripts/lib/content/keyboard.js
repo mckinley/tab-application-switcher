@@ -39,7 +39,7 @@ export default class Keyboard {
   }
 
   ready() {
-    if(this.onReady){
+    if (this.onReady) {
       this.onReady(this);
       delete this.onReady;
     }

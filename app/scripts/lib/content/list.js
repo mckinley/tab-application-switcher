@@ -2,23 +2,31 @@ import template from '~/app/templates/list.hbs';
 
 export default class List {
 
-  constructor(eventEmitter, tabs) {
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter;
-    this.tabs = tabs;
-    this.cursor = 0;
     this.root;
+    this.tabs;
+    this.cursor;
 
-    this.eventEmitter.on('keyboard:next', () => {
+    this.nextListener = () => {
       this.highlightNextTab();
-    });
+    };
 
-    this.eventEmitter.on('keyboard:previous', () => {
+    this.previousListener = () => {
       this.highlightPreviousTab();
-    });
+    };
 
-    this.eventEmitter.on('keyboard:select', () => {
+    this.selectListener = () => {
       this.selectHighlightedTab();
-    });
+    };
+  }
+
+  deactivate() {
+    this.eventEmitter.removeListener('keyboard:next', this.nextListener);
+    this.eventEmitter.removeListener('keyboard:previous', this.previousListener);
+    this.eventEmitter.removeListener('keyboard:select', this.selectListener);
+    // delete this.tabs;
+    // delete this.cursor;
   }
 
   highlightTab(tab) {
@@ -72,7 +80,13 @@ export default class List {
     });
   }
 
-  render() {
+  render(tabs) {
+    this.tabs = tabs;
+    this.cursor = 0;
+    this.eventEmitter.on('keyboard:next', this.nextListener);
+    this.eventEmitter.on('keyboard:previous', this.previousListener);
+    this.eventEmitter.on('keyboard:select', this.selectListener);
+
     this.root = document.createElement('div');
     this.root.classList.add('TAS_list');
     this.root.innerHTML = template({ tabs: this.templateTabs() });
@@ -86,6 +100,7 @@ export default class List {
 
       tabCon.addEventListener('click', () => {
         this.selectHighlightedTab();
+        this.eventEmitter.emit('list:select');
       });
 
       tab.cursor = i;
