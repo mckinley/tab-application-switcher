@@ -6,7 +6,7 @@ It's like your system's Application Switcher, but for your Chrome tabs:
 - Tabs can be accessed with intelligent and configurable keyboard shortcuts, very similar to your operating system's application switcher.
 - Tabs are ordered by their last use. The last tab you used is the first tab to select.
 
-And additional features to help you find and access your tabs:
+Additional features to help you find and access your tabs:
 - Tabs can be searched by url and page title.
 - Access your tabs in the chrome omnibox by typing 'tas' then `tab`.
 - Display appears in your current active window when using the keyboard shortcut. It is also available as an extension action in the chrome menu area.
