@@ -14,8 +14,8 @@ Additional features to help you find and access your tabs:
 Default keyboard shortcuts:
 - The current window must have focus to use keyboard shortcuts.
 - Hold `alt` and press `tab` to activate TAS.
-- While still holding `alt`, press `tab` again to move forward through the list of tabs.
-- While still holding `alt`, press `` ` `` to move backward through the list of tabs.
+- Continue holding `alt`, and press `tab` again to move forward through the list of tabs.
+- Continue holding `alt`, and press `` ` `` to move backward through the list of tabs.
 - Release `alt` to select the highlighted tab.
 
 Additional commands:
