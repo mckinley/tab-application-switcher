@@ -37,5 +37,8 @@
     "vinyl-source-stream": "^1.1.0",
     "ws": "^1.0.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "scripts": {
+    "test": "gulp test"
+  }
 }
