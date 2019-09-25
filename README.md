@@ -31,3 +31,9 @@ Additional commands:
 - click 'Load unpacked extension...'
 - select the `dist` directory
 - click the 'background page' link in the extension's card on the chrome extension page
+
+## Distribute
+- increment the version in manifest.json
+- run `gulp package`
+- go to https://chrome.google.com/webstore/developer/dashboard
+- upload package/tab-application-switcher-0.0.x.zip
