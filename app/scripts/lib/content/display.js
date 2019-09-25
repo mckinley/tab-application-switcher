@@ -33,7 +33,11 @@ export default class Display {
       this.deactivate();
     });
 
-    this.addStylesheet();
+    document.addEventListener('click', (event) => {
+      if (this.root && !this.root.contains(event.target)) {
+        this.deactivate();
+      }
+    });
 
     chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy(); });
   }
@@ -83,7 +87,7 @@ export default class Display {
     let style = document.createElement('style');
     style.id = this.stylesheetId;
     style.appendChild(document.createTextNode('@import "' + chrome.extension.getURL('styles/main.css') + '";'));
-    document.head.appendChild(style);
+    this.shadowRoot.prepend(style);
   }
 
   removeStylesheet() {
@@ -130,14 +134,13 @@ export default class Display {
   }
 
   shadow() {
-    return this.root.createShadowRoot();
+    return this.root.attachShadow({ mode: 'open' });
   }
 
   render() {
     this.root = document.createElement('div');
     this.root.classList.add('TAS_displayCon');
     let shadow = this.shadow();
-    document.body.appendChild(this.root);
 
     let root = document.createElement('div');
     root.classList.add('TAS_display');
@@ -156,5 +159,9 @@ export default class Display {
     });
 
     this.shadowRoot = shadow;
+
+    this.addStylesheet();
+
+    document.body.appendChild(this.root);
   }
 }

@@ -75,7 +75,7 @@ export default class List {
         id: tab.id,
         title: tab.title,
         url: tab.url,
-        faviconUrl: (tab.favIconUrl && tab.favIconUrl.indexOf('chrome://theme/') !== 0 ? tab.favIconUrl : '')
+        faviconUrl: tab.favIconDataUrl || (tab.favIconUrl && tab.favIconUrl.indexOf('chrome://theme/') !== 0 ? tab.favIconUrl : '')
       };
     });
   }
@@ -94,7 +94,7 @@ export default class List {
     this.tabs.forEach((tab, i) => {
       let tabCon = this.root.querySelector('[data-tab-id="' + tab.id + '"]');
 
-      tabCon.addEventListener('mouseover', () => {
+      tabCon.addEventListener('mousemove', () => {
         this.highlightTab(tab);
       });
 

@@ -40,6 +40,14 @@ export default class Tabs {
       this.unshiftTab(this.findTab(info.tabId));
     });
 
+    chrome.windows.onFocusChanged.addListener(() => {
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+        if(tabs[0]){
+          this.unshiftTab(this.findTab(tabs[0].id));
+        }
+      });
+    });
+
     this.getTabs();
   }
 
@@ -47,6 +55,27 @@ export default class Tabs {
     chrome.windows.getAll({ populate: true }, (windows) => {
       let focused;
       windows.forEach((w) => {
+
+        function toDataURL(url, callback) {
+          var xhr = new XMLHttpRequest();
+          xhr.onload = function() {
+            var reader = new FileReader();
+            reader.onloadend = function() {
+              callback(reader.result);
+            };
+            reader.readAsDataURL(xhr.response);
+          };
+          xhr.open('GET', url);
+          xhr.responseType = 'blob';
+          xhr.send();
+        }
+
+        w.tabs.map((t) => {
+          toDataURL('chrome://favicon/size/16@1x/' + t.url, (dataUrl) => {
+            t.favIconDataUrl = dataUrl;
+          });
+        });
+
         if (w.focused) {
           focused = w;
         } else {
