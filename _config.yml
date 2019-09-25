@@ -1,0 +1,8 @@
+title: Tab Application Switcher
+description: It's like your system's Application Switcher, but for your Chrome tabs.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-minimal
+
+gems:
+  - jekyll-mentions
