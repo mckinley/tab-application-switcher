@@ -2,6 +2,8 @@
 
 Tab Application Switcher (TAS)
 
+[Install from the chrome web store](https://chrome.google.com/webstore/detail/tab-application-switcher/mfcjanplaceclfoipcengelejgfngcan)
+
 It's like your system's Application Switcher, but for your Chrome tabs:
 - Tabs can be accessed with intelligent and configurable keyboard shortcuts, very similar to your operating system's application switcher.
 - Tabs are ordered by their last use. The last tab you used is the first tab to select.
