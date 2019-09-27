@@ -1,6 +1,6 @@
 export default class Omnibox {
 
-  constructor(eventEmitter) {
+  constructor (eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.tabs = [];
 
@@ -23,13 +23,16 @@ export default class Omnibox {
     });
   }
 
-  getTabs() {
-    chrome.runtime.sendMessage({ tabs: true }, (response) => {
-      this.tabs = response.tabs;
+  getTabs () {
+    this.tabs = [];
+    chrome.windows.getAll({ populate: true }, (windows) => {
+      windows.forEach((w) => {
+        this.tabs = this.tabs.concat(w.tabs);
+      });
     });
   }
 
-  suggest(text, suggest) {
+  suggest (text, suggest) {
     let suggestions = [];
     let matchedTabs = this.matchedTabs(text);
     matchedTabs.forEach((tab) => {
@@ -46,11 +49,11 @@ export default class Omnibox {
     }
   }
 
-  match(text, tab) {
+  match (text, tab) {
     return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text));
   }
 
-  matchedTabs(text) {
+  matchedTabs (text) {
     let matchedTabs = [];
     this.tabs.forEach((tab) => {
       if (this.match(text, tab)) {
@@ -60,11 +63,11 @@ export default class Omnibox {
     return matchedTabs;
   }
 
-  findTab(url) {
+  findTab (url) {
     return this.tabs.find((tab) => tab && tab.url === url);
   }
 
-  encodeXml(s) {
+  encodeXml (s) {
     const holder = document.createElement('div');
     holder.textContent = s;
     return holder.innerHTML;
