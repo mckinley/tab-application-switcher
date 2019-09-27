@@ -5,7 +5,7 @@ import List from './list';
 
 export default class Display {
 
-  constructor(eventEmitter) {
+  constructor (eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.active = false;
     this.stylesheetId = 'TAS_style';
@@ -42,7 +42,7 @@ export default class Display {
     chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy(); });
   }
 
-  activate() {
+  activate () {
     if (this.active) return;
 
     this.getTabs(() => {
@@ -51,7 +51,7 @@ export default class Display {
     this.active = true;
   }
 
-  deactivate() {
+  deactivate () {
     if (!this.active) return;
 
     this.eventEmitter.emit('display:deactivate');
@@ -64,7 +64,7 @@ export default class Display {
     this.active = false;
   }
 
-  destroy() {
+  destroy () {
     this.deactivate();
     this.removeStylesheet();
     delete this.eventEmitter;
@@ -76,28 +76,28 @@ export default class Display {
     delete this.tabs;
   }
 
-  getTabs(cb) {
+  getTabs (cb) {
     chrome.runtime.sendMessage({ tabs: true }, (response) => {
       this.tabs = response.tabs;
       cb();
     });
   }
 
-  addStylesheet() {
+  addStylesheet () {
     let style = document.createElement('style');
     style.id = this.stylesheetId;
     style.appendChild(document.createTextNode('@import "' + chrome.extension.getURL('styles/main.css') + '";'));
     this.shadowRoot.prepend(style);
   }
 
-  removeStylesheet() {
+  removeStylesheet () {
     let existingStyle = document.getElementById(this.stylesheetId);
     if (existingStyle) {
       document.head.removeChild(existingStyle);
     }
   }
 
-  toggleOptions() {
+  toggleOptions () {
     if (this.options && this.options.active) {
       this.deactivateOptions();
     } else {
@@ -105,7 +105,7 @@ export default class Display {
     }
   }
 
-  activateOptions() {
+  activateOptions () {
     if (this.options && this.options.active) return;
 
     let element = this.shadowRoot.querySelector('.TAS_optionsCon');
@@ -123,7 +123,7 @@ export default class Display {
     this.eventEmitter.emit('display:options');
   }
 
-  deactivateOptions() {
+  deactivateOptions () {
     if (!this.options.active) return;
 
     let element = this.shadowRoot.querySelector('.TAS_optionsCon');
@@ -133,11 +133,11 @@ export default class Display {
     this.options.deactivate();
   }
 
-  shadow() {
+  shadow () {
     return this.root.attachShadow({ mode: 'open' });
   }
 
-  render() {
+  render () {
     this.root = document.createElement('div');
     this.root.classList.add('TAS_displayCon');
     let shadow = this.shadow();

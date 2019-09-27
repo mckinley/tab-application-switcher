@@ -3,7 +3,7 @@ import Combokeys from 'combokeys';
 
 export default class Keyboard {
 
-  constructor(eventEmitter) {
+  constructor (eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.active = false;
     this.onReady;
@@ -36,16 +36,28 @@ export default class Keyboard {
     });
 
     chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy(); });
+
+    chrome.runtime.onMessage.addListener(
+      (request) => {
+        if (request.action === 'activate') {
+          if (this.active) {
+            this.eventEmitter.emit('keyboard:next');
+          } else {
+            this.eventEmitter.emit('keyboard:activate');
+            this.activate();
+          }
+        }
+      });
   }
 
-  ready() {
+  ready () {
     if (this.onReady) {
       this.onReady(this);
       delete this.onReady;
     }
   }
 
-  activate() {
+  activate () {
     if (this.active) return;
 
     this.bindKeyset(this.keys.next, () => {
@@ -81,7 +93,7 @@ export default class Keyboard {
     this.active = true;
   }
 
-  deactivate() {
+  deactivate () {
     if (!this.active) return;
 
     this.unbindKeyset(this.keys.next);
@@ -99,7 +111,7 @@ export default class Keyboard {
     this.active = false;
   }
 
-  destroy() {
+  destroy () {
     this.deactivate();
     this.activateKeyBinder.unbind(this.keys.activate);
     delete this.eventEmitter;
@@ -110,19 +122,19 @@ export default class Keyboard {
     delete this.activateKeyBinder;
   }
 
-  bindKeyset(keyset, cb) {
+  bindKeyset (keyset, cb) {
     keyset.forEach((k) => {
       this.keyBinder.bind(k, cb);
     });
   }
 
-  unbindKeyset(keyset) {
+  unbindKeyset (keyset) {
     keyset.forEach((k) => {
       this.keyBinder.unbind(k);
     });
   }
 
-  initKeys(value) {
+  initKeys (value) {
     let os = navigator.platform.indexOf('Mac') > -1 ? 'mac' : 'windows';
     this.keys = value[os];
 
@@ -144,7 +156,7 @@ export default class Keyboard {
     this.ready();
   }
 
-  updateKeys(value) {
+  updateKeys (value) {
     this.deactivate();
     this.keyBinder.unbind(this.keys.next);
     this.initKeys(value);

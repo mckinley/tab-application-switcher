@@ -1,8 +1,18 @@
 export default class Tabs {
 
-  constructor(eventEmitter) {
+  constructor (eventEmitter) {
     this.eventEmitter = eventEmitter;
     this.tabs = [];
+
+    chrome.commands.onCommand.addListener((command) => {
+      if (command === 'activate') {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+          if (tabs.length) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'activate' });
+          }
+        });
+      }
+    });
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.tabs) {
@@ -42,7 +52,7 @@ export default class Tabs {
 
     chrome.windows.onFocusChanged.addListener(() => {
       chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-        if(tabs[0]){
+        if (tabs[0]) {
           this.unshiftTab(this.findTab(tabs[0].id));
         }
       });
@@ -51,16 +61,16 @@ export default class Tabs {
     this.getTabs();
   }
 
-  getTabs() {
+  getTabs () {
     chrome.windows.getAll({ populate: true }, (windows) => {
       let focused;
       windows.forEach((w) => {
 
-        function toDataURL(url, callback) {
+        function toDataURL (url, callback) {
           var xhr = new XMLHttpRequest();
-          xhr.onload = function() {
+          xhr.onload = function () {
             var reader = new FileReader();
-            reader.onloadend = function() {
+            reader.onloadend = function () {
               callback(reader.result);
             };
             reader.readAsDataURL(xhr.response);
@@ -90,12 +100,12 @@ export default class Tabs {
     });
   }
 
-  selectTab(tab) {
+  selectTab (tab) {
     chrome.windows.update(tab.windowId, { focused: true });
     chrome.tabs.update(tab.id, { selected: true });
   }
 
-  unshiftTab(tab) {
+  unshiftTab (tab) {
     let index = this.tabs.indexOf(tab);
     if (index === -1) {
       this.tabs.unshift(tab);
@@ -104,11 +114,11 @@ export default class Tabs {
     }
   }
 
-  removeTab(id) {
+  removeTab (id) {
     this.tabs.splice(this.tabs.indexOf(this.findTab(id)), 1);
   }
 
-  findTab(id) {
+  findTab (id) {
     return this.tabs.find((tab) => tab && tab.id === id);
   }
 }

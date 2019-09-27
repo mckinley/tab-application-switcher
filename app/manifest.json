@@ -51,5 +51,18 @@
     },
     "default_title": "Tab Application Switcher",
     "default_popup": "popup.html"
+  },
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Alt+Z"
+      }
+    },
+    "activate": {
+      "suggested_key": {
+        "default": "Alt+Tab"
+      },
+      "description": "Activate Tab Application Switcher"
+    }
   }
 }

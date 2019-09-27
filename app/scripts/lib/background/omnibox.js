@@ -65,7 +65,7 @@ export default class Omnibox {
   }
 
   encodeXml(s) {
-    var holder = document.createElement('div');
+    const holder = document.createElement('div');
     holder.textContent = s;
     return holder.innerHTML;
   }
