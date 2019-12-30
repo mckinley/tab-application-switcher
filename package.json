@@ -25,7 +25,7 @@
     "gulp-sourcemaps": "^2.0.0-alpha",
     "gulp-util": "^3.0.7",
     "gulp-zip": "^3.2.0",
-    "handlebars": "^4.0.5",
+    "handlebars": "^4.3.0",
     "hbsfy": "^2.7.0",
     "jsdom": "9.4.2",
     "jsdom-global": "2.0.0",
