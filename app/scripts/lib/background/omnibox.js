@@ -1,75 +1,74 @@
 export default class Omnibox {
-
   constructor (eventEmitter) {
-    this.eventEmitter = eventEmitter;
-    this.tabs = [];
+    this.eventEmitter = eventEmitter
+    this.tabs = []
 
     chrome.omnibox.onInputStarted.addListener(() => {
-      this.getTabs();
-    });
+      this.getTabs()
+    })
 
     chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-      this.suggest(text, suggest);
-    });
+      this.suggest(text, suggest)
+    })
 
     chrome.omnibox.onInputEntered.addListener((text, _disposition) => {
-      let tab = this.findTab(text);
+      let tab = this.findTab(text)
       if (!tab) {
-        tab = this.matchedTabs(text)[0];
+        tab = this.matchedTabs(text)[0]
       }
       if (tab) {
-        this.eventEmitter.emit('omnibox:select-tab', tab);
+        this.eventEmitter.emit('omnibox:select-tab', tab)
       }
-    });
+    })
   }
 
   getTabs () {
-    this.tabs = [];
+    this.tabs = []
     chrome.windows.getAll({ populate: true }, (windows) => {
       windows.forEach((w) => {
-        this.tabs = this.tabs.concat(w.tabs);
-      });
-    });
+        this.tabs = this.tabs.concat(w.tabs)
+      })
+    })
   }
 
   suggest (text, suggest) {
-    let suggestions = [];
-    let matchedTabs = this.matchedTabs(text);
+    const suggestions = []
+    const matchedTabs = this.matchedTabs(text)
     matchedTabs.forEach((tab) => {
-      suggestions.push({ content: tab.url, description: 'tab: <match>' + this.encodeXml(tab.title) + '</match>' });
-    });
+      suggestions.push({ content: tab.url, description: 'tab: <match>' + this.encodeXml(tab.title) + '</match>' })
+    })
 
     if (suggestions.length > 0) {
-      chrome.omnibox.setDefaultSuggestion({ description: suggestions[0].description });
-      suggestions.shift();
+      chrome.omnibox.setDefaultSuggestion({ description: suggestions[0].description })
+      suggestions.shift()
     }
 
     if (suggestions.length > 0) {
-      suggest(suggestions);
+      suggest(suggestions)
     }
   }
 
   match (text, tab) {
-    return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text));
+    return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text))
   }
 
   matchedTabs (text) {
-    let matchedTabs = [];
+    const matchedTabs = []
     this.tabs.forEach((tab) => {
       if (this.match(text, tab)) {
-        matchedTabs.push(tab);
+        matchedTabs.push(tab)
       }
-    });
-    return matchedTabs;
+    })
+    return matchedTabs
   }
 
   findTab (url) {
-    return this.tabs.find((tab) => tab && tab.url === url);
+    return this.tabs.find((tab) => tab && tab.url === url)
   }
 
   encodeXml (s) {
-    const holder = document.createElement('div');
-    holder.textContent = s;
-    return holder.innerHTML;
+    const holder = document.createElement('div')
+    holder.textContent = s
+    return holder.innerHTML
   }
 }

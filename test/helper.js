@@ -1,24 +1,31 @@
-import chai from 'chai';
-import sinon from 'sinon';
-import sinonChrome from 'sinon-chrome';
-import 'jsdom-global/register';
+import chai from 'chai'
+import sinon from 'sinon'
+import sinonChrome from 'sinon-chrome'
+import 'jsdom-global/register.js'
 
-function setGlobal(property, value) {
+function setGlobal (property, value) {
   if (global[property] === undefined) {
-    global[property] = value;
+    global[property] = value
   }
 }
 
-setGlobal('expect', chai.expect);
-setGlobal('sinon', sinon);
-setGlobal('chrome', sinonChrome);
+before(() => {
+  setGlobal('chrome', sinonChrome)
+  setGlobal('expect', chai.expect)
+  setGlobal('sinon', sinon)
 
-beforeEach(function() {
-  this.sinon = sinon.sandbox.create();
-});
+  chrome.runtime.connect.returns({
+    onDisconnect: {
+      addListener: () => {
+      }
+    }
+  })
+})
 
-afterEach(function(){
-  this.sinon.restore();
-});
+after(() => {
+  sinonChrome.flush()
 
-chrome.runtime.connect.returns({ onDisconnect: { addListener: () => {} } });
+  delete global.chrome
+  delete global.expect
+  delete global.sinon
+})
