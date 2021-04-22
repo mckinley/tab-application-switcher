@@ -34,7 +34,9 @@ export default class Keyboard {
       }
     })
 
-    chrome.runtime.connect().onDisconnect.addListener(() => { this.destroy() })
+    chrome.runtime.connect().onDisconnect.addListener(() => {
+      this.destroy()
+    })
 
     chrome.runtime.onMessage.addListener(
       (request) => {
@@ -141,10 +143,23 @@ export default class Keyboard {
     const m = this.keys.modifier
 
     k.activate = m + '+' + k.next
-    k.next = [k.activate, m + '+' + 'down', 'down']
-    k.previous = [m + '+' + k.previous, m + '+' + 'up', 'up']
-    k.select = [m + '+' + 'enter', 'enter']
-    k.cancel = [m + '+' + 'esc', 'esc']
+    k.next = [
+      k.activate,
+      m + '+' + 'down',
+      'down'
+    ]
+    k.previous = [
+      m + '+' + k.previous,
+      m + '+' + 'up', 'up'
+    ]
+    k.select = [
+      m + '+' + 'enter',
+      'enter'
+    ]
+    k.cancel = [
+      m + '+' + 'esc',
+      'esc'
+    ]
 
     this.activateKeyBinder.bind(k.activate, () => {
       this.eventEmitter.emit('keyboard:activate')

@@ -8,6 +8,9 @@ import gulpStandard from 'gulp-standard'
 import gulpZip from 'gulp-zip'
 import gulpLog from 'gulplog'
 import { rollup } from 'rollup'
+import strip from '@rollup/plugin-strip'
+import modify from 'rollup-plugin-modify'
+import { terser } from 'rollup-plugin-terser'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
@@ -94,15 +97,23 @@ function zip () {
     .pipe(gulp.dest(paths.zip.dest))
 }
 
-async function scripts () {
+async function _scripts (opts = {}) {
   const files = glob.sync(paths.scripts.src, { ignore: paths.scripts.ignore, dot: true })
   files.map(async (file) => {
     const bundle = await rollup({
       input: file,
       plugins: [
+        opts.package && (
+          modify({
+            find: RegExp('.*// dev'),
+            replace: ''
+          })
+        ),
+        opts.package && strip(),
         nodePolyfills(),
         nodeResolve(),
-        commonjs()
+        commonjs(),
+        opts.package && terser()
       ]
     })
 
@@ -111,6 +122,14 @@ async function scripts () {
       format: 'umd'
     })
   })
+}
+
+function scripts () {
+  return _scripts()
+}
+
+function scriptsPackage () {
+  return _scripts({ package: true })
 }
 
 function styles () {
@@ -127,7 +146,6 @@ function _lint (opts = {}) {
   return gulp.src(src, { base: './', since: changed ? gulp.lastRun(src) : undefined })
     .pipe(gulpStandard({ fix: fix }))
     .pipe(gulpStandard.reporter('default', {
-      breakOnError: true,
       quiet: true,
       showRuleNames: true
     }))
@@ -166,8 +184,12 @@ function testChanged () {
 function dev () {
   let reloader
   const server = new ws.Server({ port: 5454 })
-  server.on('connection', (ws) => reloader = ws)
-  server.on('message', (message) => gulpLog(message))
+  server.on('connection', (ws) => {
+    reloader = ws
+  })
+  server.on('message', (message) => {
+    gulpLog(message)
+  })
 
   async function reload () {
     if (reloader) {
@@ -197,6 +219,20 @@ const build = gulp.series(
   styles
 )
 
+const pack = gulp.series(
+  clean,
+  lintFix,
+  test,
+  fonts,
+  html,
+  images,
+  locales,
+  manifest,
+  scriptsPackage,
+  styles,
+  zip
+)
+
 export default gulp.series(
   clean,
   build,
@@ -215,7 +251,9 @@ export {
   lintFix,
   locales,
   manifest,
+  pack,
   scripts,
+  scriptsPackage,
   styles,
   test,
   testChanged,

@@ -1,20 +1,20 @@
 export default class Reloader {
   constructor () {
     this.socket = new WebSocket('ws://localhost:5454')
-    this.socket.onerror = e => {
-      this.log(e, 'error')
+    this.socket.onerror = error => {
+      this.log(error, 'error')
     }
 
-    this.socket.onmessage = e => {
-      this.log(JSON.stringify(e, null, 2))
-      if (e.data === 'reload-extension') {
+    this.socket.onmessage = event => {
+      this.log(JSON.stringify(event, null, 2))
+      if (event.data === 'reload-extension') {
         chrome.runtime.reload()
       }
     }
   }
 
-  log(message, type = 'info'){
-    message = `'WebSocket ${type}: ${message}`
+  log (message, type = 'info') {
+    message = `'WebSocket ${type}: ${typeof message === 'string' ? message : JSON.stringify(message, null, 2)}`
     console.log(message)
     this.socket.send(message)
   }
