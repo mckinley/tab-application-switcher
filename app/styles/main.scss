@@ -1,3 +1,7 @@
+:host {
+  all: initial;
+}
+
 @import './lib/display';
 @import './lib/popup';
 @import './lib/options';

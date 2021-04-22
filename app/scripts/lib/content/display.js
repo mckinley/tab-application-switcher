@@ -160,7 +160,7 @@ export default class Display {
   }
 
   shadow () {
-    return this.root.attachShadow({ mode: 'open' })
+    return this.root.attachShadow({ mode: 'closed' })
   }
 
   render () {
