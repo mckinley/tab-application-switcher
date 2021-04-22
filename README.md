@@ -36,6 +36,7 @@ Additional commands:
 
 ## Distribute
 - increment the version in manifest.json
-- run `gulp package`
-- go to https://chrome.google.com/webstore/developer/dashboard
+- run `gulp pack`
+- go to the [Google Chrome Extension](https://chrome.google.com/webstore/developer/dashboard)
+- and the [Microsoft Edge Extension](https://partner.microsoft.com/en-us/dashboard/microsoftedge/fe1f2d5b-8edd-437a-bd83-daeddebedfca/packages/overview)
 - upload package/tab-application-switcher-0.0.x.zip
