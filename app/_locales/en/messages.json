@@ -3,10 +3,10 @@
     "message": "Tab Application Switcher"
   },
   "app_short_name": {
-    "message": "Tab Application Switcher"
+    "message": "TAS"
   },
   "app_description": {
-    "message": "Application switcher for Chrome tabs"
+    "message": "Application switcher for Browser tabs"
   },
   "modifier": {
     "message": "modifier"
