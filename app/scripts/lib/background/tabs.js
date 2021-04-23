@@ -26,6 +26,8 @@ export default class Tabs {
     })
 
     chrome.tabs.onCreated.addListener((tab) => {
+      this.enhanceTab(tab)
+
       if (tab.active) {
         this.tabs.unshift(tab)
       } else {
@@ -60,29 +62,31 @@ export default class Tabs {
     this.getTabs()
   }
 
+  toDataURL (url, callback) {
+    const xhr = new XMLHttpRequest()
+    xhr.onload = function () {
+      const reader = new FileReader()
+      reader.onloadend = function () {
+        callback(reader.result)
+      }
+      reader.readAsDataURL(xhr.response)
+    }
+    xhr.open('GET', url)
+    xhr.responseType = 'blob'
+    xhr.send()
+  }
+
+  enhanceTab (tab) {
+    this.toDataURL('chrome://favicon/size/16@1x/' + tab.url, (dataUrl) => {
+      tab.favIconDataUrl = dataUrl
+    })
+  }
+
   getTabs () {
     chrome.windows.getAll({ populate: true }, (windows) => {
       let focused
       windows.forEach((w) => {
-        function toDataURL (url, callback) {
-          var xhr = new XMLHttpRequest()
-          xhr.onload = function () {
-            var reader = new FileReader()
-            reader.onloadend = function () {
-              callback(reader.result)
-            }
-            reader.readAsDataURL(xhr.response)
-          }
-          xhr.open('GET', url)
-          xhr.responseType = 'blob'
-          xhr.send()
-        }
-
-        w.tabs.map((t) => {
-          toDataURL('chrome://favicon/size/16@1x/' + t.url, (dataUrl) => {
-            t.favIconDataUrl = dataUrl
-          })
-        })
+        w.tabs.map((t) => this.enhanceTab(t))
 
         if (w.focused) {
           focused = w

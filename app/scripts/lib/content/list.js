@@ -80,7 +80,7 @@ export default class List {
   }
 
   templateTabs () {
-    return this.tabs.map(function (tab) {
+    return this.tabs.map((tab) => {
       return {
         id: tab.id,
         title: tab.title,
