@@ -5,7 +5,7 @@ export default class Tabs {
 
     chrome.commands.onCommand.addListener((command) => {
       if (command === 'activate') {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (tabs.length) {
             chrome.tabs.sendMessage(tabs[0].id, { action: 'activate' })
           }
@@ -21,26 +21,24 @@ export default class Tabs {
       }
     })
 
+    chrome.windows.onFocusChanged.addListener(() => {
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+        if (tabs[0]) {
+          this.unshiftTab(this.findTab(tabs[0].id))
+        }
+      })
+    })
+
     this.eventEmitter.on('omnibox:select-tab', (tab) => {
       this.selectTab(tab)
     })
 
     chrome.tabs.onCreated.addListener((tab) => {
-      this.enhanceTab(tab)
-
-      if (tab.active) {
-        this.tabs.unshift(tab)
-      } else {
-        this.tabs.push(tab)
-      }
+      this.addTab(tab)
     })
 
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      this.tabs[this.tabs.indexOf(this.findTab(tabId))] = tab
-    })
-
-    chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
-      this.removeTab(removedTabId)
+      this.replaceTab(tabId, tab)
     })
 
     chrome.tabs.onRemoved.addListener((id) => {
@@ -51,35 +49,11 @@ export default class Tabs {
       this.unshiftTab(this.findTab(info.tabId))
     })
 
-    chrome.windows.onFocusChanged.addListener(() => {
-      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-        if (tabs[0]) {
-          this.unshiftTab(this.findTab(tabs[0].id))
-        }
-      })
+    chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+      this.removeTab(removedTabId)
     })
 
     this.getTabs()
-  }
-
-  toDataURL (url, callback) {
-    const xhr = new XMLHttpRequest()
-    xhr.onload = function () {
-      const reader = new FileReader()
-      reader.onloadend = function () {
-        callback(reader.result)
-      }
-      reader.readAsDataURL(xhr.response)
-    }
-    xhr.open('GET', url)
-    xhr.responseType = 'blob'
-    xhr.send()
-  }
-
-  enhanceTab (tab) {
-    this.toDataURL('chrome://favicon/size/16@1x/' + tab.url, (dataUrl) => {
-      tab.favIconDataUrl = dataUrl
-    })
   }
 
   getTabs () {
@@ -107,6 +81,26 @@ export default class Tabs {
     chrome.tabs.update(tab.id, { selected: true })
   }
 
+  findTab (id) {
+    return this.tabs.find((tab) => tab && tab.id === id)
+  }
+
+  addTab (tab) {
+    this.enhanceTab(tab)
+
+    if (tab.active) {
+      this.tabs.unshift(tab)
+    } else {
+      this.tabs.push(tab)
+    }
+  }
+
+  replaceTab (oldId, newTab) {
+    this.enhanceTab(newTab)
+
+    this.tabs[this.tabs.indexOf(this.findTab(oldId))] = newTab
+  }
+
   unshiftTab (tab) {
     const index = this.tabs.indexOf(tab)
     if (index === -1) {
@@ -120,7 +114,23 @@ export default class Tabs {
     this.tabs.splice(this.tabs.indexOf(this.findTab(id)), 1)
   }
 
-  findTab (id) {
-    return this.tabs.find((tab) => tab && tab.id === id)
+  toDataURL (url, callback) {
+    const xhr = new XMLHttpRequest()
+    xhr.onload = () => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        callback(reader.result)
+      }
+      reader.readAsDataURL(xhr.response)
+    }
+    xhr.open('GET', url)
+    xhr.responseType = 'blob'
+    xhr.send()
+  }
+
+  enhanceTab (tab) {
+    this.toDataURL('chrome://favicon/size/16@1x/' + tab.url, (dataUrl) => {
+      tab.favIconDataUrl = dataUrl
+    })
   }
 }

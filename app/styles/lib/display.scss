@@ -13,6 +13,7 @@ $font-name: 'Roboto';
 }
 
 .TAS_display {
+  display: block !important;
   color: #696969;
   position: fixed;
   overflow: auto;

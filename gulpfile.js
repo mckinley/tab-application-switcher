@@ -99,7 +99,7 @@ function zip () {
 
 async function _scripts (opts = {}) {
   const files = glob.sync(paths.scripts.src, { ignore: paths.scripts.ignore, dot: true })
-  files.map(async (file) => {
+  const promises = files.map(async (file) => {
     const bundle = await rollup({
       input: file,
       plugins: [
@@ -122,6 +122,8 @@ async function _scripts (opts = {}) {
       format: 'umd'
     })
   })
+
+  await Promise.all(promises)
 }
 
 function scripts () {

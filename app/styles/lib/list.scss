@@ -25,6 +25,7 @@
       vertical-align: middle;
     }
     .TAS_tabIcon {
+      -webkit-border-radius: 2px;
       position: absolute;
       height: 16px;
       width: 16px;
@@ -34,7 +35,6 @@
       background-position: center;
       background-repeat: no-repeat;
       background-color: white;
-      -webkit-border-radius: 2px;
     }
   }
 }

@@ -169,6 +169,7 @@ export default class Display {
     const shadow = this.shadow()
 
     const root = document.createElement('div')
+    root.style.display = 'none'
     root.classList.add('TAS_display')
     root.innerHTML = template
     shadow.appendChild(root)

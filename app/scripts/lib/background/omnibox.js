@@ -12,13 +12,8 @@ export default class Omnibox {
     })
 
     chrome.omnibox.onInputEntered.addListener((text, _disposition) => {
-      let tab = this.findTab(text)
-      if (!tab) {
-        tab = this.matchedTabs(text)[0]
-      }
-      if (tab) {
-        this.eventEmitter.emit('omnibox:select-tab', tab)
-      }
+      const tab = this.findTab(text) || this.matchedTabs(text)[0]
+      if (tab) this.eventEmitter.emit('omnibox:select-tab', tab)
     })
   }
 
@@ -35,7 +30,7 @@ export default class Omnibox {
     const suggestions = []
     const matchedTabs = this.matchedTabs(text)
     matchedTabs.forEach((tab) => {
-      suggestions.push({ content: tab.url, description: 'tab: <match>' + this.encodeXml(tab.title) + '</match>' })
+      suggestions.push({ content: tab.url, description: `tab: <match>${this.encodeXml(tab.title)}</match>` })
     })
 
     if (suggestions.length > 0) {
