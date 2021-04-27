@@ -7,8 +7,8 @@ export default class Keyboard {
     this.active = false
     this.onReady = undefined
     this.keys = undefined
-    this.keyBinder = new Combokeys(document)
-    this.activateKeyBinder = new Combokeys(document)
+    this.keyBinder = new Combokeys(document.documentElement)
+    this.activateKeyBinder = new Combokeys(document.documentElement)
 
     this.eventEmitter.on('display:search', () => {
       this.keyBinder.unbind(this.keys.modifier, 'keyup')
@@ -60,6 +60,8 @@ export default class Keyboard {
 
   activate () {
     if (this.active) return
+
+    document.activeElement.blur()
 
     this.bindKeyset(this.keys.next, () => {
       this.eventEmitter.emit('keyboard:next')
@@ -136,7 +138,7 @@ export default class Keyboard {
   }
 
   initKeys (value) {
-    const os = navigator.platform.indexOf('Mac') > -1 ? 'mac' : 'windows'
+    const os = navigator.platform.indexOf('Mac') === -1 ? 'windows' : 'mac'
     this.keys = value[os]
 
     const k = this.keys
