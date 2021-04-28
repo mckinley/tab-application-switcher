@@ -25,6 +25,15 @@ Additional commands:
 - Press `enter` to select the highlighted tab.
 - Press `esc` to close TAS without making a selection.
 
+Limitations:
+
+- Tab Application Switcher will not automatically select a tab while focus is in the address bar (omnibox).
+If you find that your selected tab is not activating when you release the modifier key, you may need to click the desired tab in TAS with your mouse.
+- Keyboard shortcuts will not activate TAS on the Chrome Web Store, on New Tab pages, or on other settings-like pages (urls starting with chrome://).
+Click the extension icon to activate TAS in these situations.
+- It is possible that other extensions or system preferences can conflict with TAS keyboard shortcuts.
+The Options panel can be used to change TAS keyboard shortcuts. Further management can be done here: chrome://extensions/shortcuts
+
 ## Development
 - run `npm install`
 - run `node_modules/.bin/gulp dev`
