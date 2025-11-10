@@ -1,19 +1,39 @@
+import { isRestrictedChromeUrl } from '../utils.js'
+
 export default class Tabs {
-  constructor (eventEmitter) {
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter
     this.tabs = []
 
     chrome.commands.onCommand.addListener((command) => {
       if (command === 'activate') {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
           if (tabs.length) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: 'activate' })
+            const tab = tabs[0]
+
+            // Check if the tab URL is a restricted Chrome page
+            if (isRestrictedChromeUrl(tab.url)) {
+              // Cannot inject content scripts into Chrome internal pages
+              console.log('[TAS] Cannot activate on restricted page:', tab.url)
+              return
+            }
+
+            try {
+              await chrome.tabs.sendMessage(tab.id, { action: 'activate' })
+            } catch (error) {
+              // Content script might not be injected yet or page doesn't allow it
+              if (error.message && error.message.includes('Receiving end does not exist')) {
+                console.log('[TAS] Content script not available on tab:', tab.url)
+              } else {
+                console.error('[TAS] Failed to send activate message:', error)
+              }
+            }
           }
         })
       }
     })
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       if (request.tabs) {
         sendResponse({ tabs: this.tabs })
       } else if (request.selectTab) {
@@ -37,7 +57,7 @@ export default class Tabs {
       this.addTab(tab)
     })
 
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    chrome.tabs.onUpdated.addListener((tabId, _changeInfo, tab) => {
       this.replaceTab(tabId, tab)
     })
 
@@ -49,19 +69,18 @@ export default class Tabs {
       this.unshiftTab(this.findTab(info.tabId))
     })
 
-    chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+    chrome.tabs.onReplaced.addListener((_addedTabId, removedTabId) => {
       this.removeTab(removedTabId)
     })
 
     this.getTabs()
   }
 
-  getTabs () {
+  getTabs() {
     chrome.windows.getAll({ populate: true }, (windows) => {
       let focused
-      windows.forEach((w) => {
-        w.tabs.map((t) => this.enhanceTab(t))
 
+      windows.forEach((w) => {
         if (w.focused) {
           focused = w
         } else {
@@ -73,64 +92,47 @@ export default class Tabs {
         this.tabs = focused.tabs.concat(this.tabs)
         this.unshiftTab(focused.tabs.find((tab) => tab.active))
       }
+
+      // Emit event for favicon preloading
+      this.eventEmitter.emit('tabs:updated', this.tabs)
     })
   }
 
-  selectTab (tab) {
+  selectTab(tab) {
     chrome.windows.update(tab.windowId, { focused: true })
-    chrome.tabs.update(tab.id, { selected: true })
+    chrome.tabs.update(tab.id, { active: true })
   }
 
-  findTab (id) {
+  findTab(id) {
     return this.tabs.find((tab) => tab && tab.id === id)
   }
 
-  addTab (tab) {
-    this.enhanceTab(tab)
-
+  addTab(tab) {
     if (tab.active) {
       this.tabs.unshift(tab)
     } else {
       this.tabs.push(tab)
     }
+    this.eventEmitter.emit('tabs:updated', this.tabs)
   }
 
-  replaceTab (oldId, newTab) {
-    this.enhanceTab(newTab)
-
+  replaceTab(oldId, newTab) {
     this.tabs[this.tabs.indexOf(this.findTab(oldId))] = newTab
+    this.eventEmitter.emit('tabs:updated', this.tabs)
   }
 
-  unshiftTab (tab) {
+  unshiftTab(tab) {
     const index = this.tabs.indexOf(tab)
     if (index === -1) {
       this.tabs.unshift(tab)
     } else {
       this.tabs.unshift(this.tabs.splice(index, 1)[0])
     }
+    this.eventEmitter.emit('tabs:updated', this.tabs)
   }
 
-  removeTab (id) {
+  removeTab(id) {
     this.tabs.splice(this.tabs.indexOf(this.findTab(id)), 1)
-  }
-
-  toDataURL (url, callback) {
-    const xhr = new XMLHttpRequest()
-    xhr.onload = () => {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        callback(reader.result)
-      }
-      reader.readAsDataURL(xhr.response)
-    }
-    xhr.open('GET', url)
-    xhr.responseType = 'blob'
-    xhr.send()
-  }
-
-  enhanceTab (tab) {
-    this.toDataURL('chrome://favicon/size/16@1x/' + tab.url, (dataUrl) => {
-      tab.favIconDataUrl = dataUrl
-    })
+    this.eventEmitter.emit('tabs:updated', this.tabs)
   }
 }

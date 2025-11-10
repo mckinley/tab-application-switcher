@@ -3,7 +3,9 @@ import Keyboard from './lib/content/keyboard'
 import Display from './lib/content/display'
 
 const eventEmitter = new EventEmitter()
-new Keyboard(eventEmitter).onReady = (k) => { k.activate() }
+new Keyboard(eventEmitter).onReady = (k) => {
+  k.activate()
+}
 new Display(eventEmitter).activate()
 
 eventEmitter.on('display:deactivate', () => {

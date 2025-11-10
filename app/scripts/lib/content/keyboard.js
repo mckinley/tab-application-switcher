@@ -2,7 +2,7 @@ import defaultOptions from '../default-options.js'
 import Combokeys from 'combokeys'
 
 export default class Keyboard {
-  constructor (eventEmitter) {
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter
     this.active = false
     this.onReady = undefined
@@ -22,11 +22,13 @@ export default class Keyboard {
       this.deactivate()
     })
 
-    chrome.storage.onChanged.addListener((changes, _namespace) => {
+    // Store the storage listener so we can remove it on destroy
+    this.storageListener = (changes, _namespace) => {
       if (changes.keys.newValue) {
         this.updateKeys(changes.keys.newValue)
       }
-    })
+    }
+    chrome.storage.onChanged.addListener(this.storageListener)
 
     chrome.storage.sync.get(defaultOptions, (storage) => {
       if (storage.keys) {
@@ -38,27 +40,34 @@ export default class Keyboard {
       this.destroy()
     })
 
-    chrome.runtime.onMessage.addListener(
-      (request) => {
-        if (request.action === 'activate') {
-          if (this.active) {
-            this.eventEmitter.emit('keyboard:next')
-          } else {
-            this.eventEmitter.emit('keyboard:activate')
-            this.activate()
-          }
+    // Store the message listener so we can remove it on destroy
+    this.messageListener = (request, _sender, sendResponse) => {
+      // Respond to ping messages to check if content script is already injected
+      if (request.ping) {
+        sendResponse({ pong: true })
+        return
+      }
+
+      if (request.action === 'activate') {
+        if (this.active) {
+          this.eventEmitter.emit('keyboard:next')
+        } else {
+          this.eventEmitter.emit('keyboard:activate')
+          this.activate()
         }
-      })
+      }
+    }
+    chrome.runtime.onMessage.addListener(this.messageListener)
   }
 
-  ready () {
+  ready() {
     if (this.onReady) {
       this.onReady(this)
       delete this.onReady
     }
   }
 
-  activate () {
+  activate() {
     if (this.active) return
 
     document.activeElement.blur()
@@ -85,18 +94,22 @@ export default class Keyboard {
       return false
     })
 
-    this.keyBinder.bind(this.keys.modifier, () => {
-      this.eventEmitter.emit('keyboard:select')
-      this.deactivate()
-      return false
-    }, 'keyup')
+    this.keyBinder.bind(
+      this.keys.modifier,
+      () => {
+        this.eventEmitter.emit('keyboard:select')
+        this.deactivate()
+        return false
+      },
+      'keyup'
+    )
 
     this.activateKeyBinder.unbind(this.keys.activate)
 
     this.active = true
   }
 
-  deactivate () {
+  deactivate() {
     if (!this.active) return
 
     this.unbindKeyset(this.keys.next)
@@ -114,30 +127,35 @@ export default class Keyboard {
     this.active = false
   }
 
-  destroy () {
+  destroy() {
     this.deactivate()
     this.activateKeyBinder.unbind(this.keys.activate)
-    delete this.eventEmitter
-    delete this.active
-    delete this.onReady
-    delete this.keys
-    delete this.keyBinder
-    delete this.activateKeyBinder
+
+    // Remove Chrome API listeners
+    chrome.runtime.onMessage.removeListener(this.messageListener)
+    chrome.storage.onChanged.removeListener(this.storageListener)
+
+    // Remove all EventEmitter listeners
+    this.eventEmitter.removeAllListeners()
+
+    // Detach Combokeys instances to remove all DOM event listeners
+    this.keyBinder.detach()
+    this.activateKeyBinder.detach()
   }
 
-  bindKeyset (keyset, cb) {
+  bindKeyset(keyset, cb) {
     keyset.forEach((k) => {
       this.keyBinder.bind(k, cb)
     })
   }
 
-  unbindKeyset (keyset) {
+  unbindKeyset(keyset) {
     keyset.forEach((k) => {
       this.keyBinder.unbind(k)
     })
   }
 
-  initKeys (value) {
+  initKeys(value) {
     const os = navigator.platform.indexOf('Mac') === -1 ? 'windows' : 'mac'
     this.keys = value[os]
 
@@ -145,23 +163,10 @@ export default class Keyboard {
     const m = this.keys.modifier
 
     k.activate = m + '+' + k.next
-    k.next = [
-      k.activate,
-      m + '+' + 'down',
-      'down'
-    ]
-    k.previous = [
-      m + '+' + k.previous,
-      m + '+' + 'up', 'up'
-    ]
-    k.select = [
-      m + '+' + 'enter',
-      'enter'
-    ]
-    k.cancel = [
-      m + '+' + 'esc',
-      'esc'
-    ]
+    k.next = [k.activate, m + '+' + 'down', 'down']
+    k.previous = [m + '+' + k.previous, m + '+' + 'up', 'up']
+    k.select = [m + '+' + 'enter', 'enter']
+    k.cancel = [m + '+' + 'esc', m + '+' + 'q', 'esc']
 
     this.activateKeyBinder.bind(k.activate, () => {
       this.eventEmitter.emit('keyboard:activate')
@@ -172,7 +177,7 @@ export default class Keyboard {
     this.ready()
   }
 
-  updateKeys (value) {
+  updateKeys(value) {
     this.deactivate()
     this.keyBinder.unbind(this.keys.next)
     this.initKeys(value)

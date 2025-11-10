@@ -5,7 +5,7 @@ import defaultOptions from '../../../../app/scripts/lib/default-options.js'
 
 describe('Keyboard', () => {
   describe('initKeys', () => {
-    function platform (value) {
+    function platform(value) {
       navigator.__defineGetter__('platform', () => {
         return value
       })
@@ -21,7 +21,7 @@ describe('Keyboard', () => {
         previous: ['meta+`', 'meta+up', 'up'],
         activate: 'meta+tab',
         select: ['meta+enter', 'enter'],
-        cancel: ['meta+esc', 'esc']
+        cancel: ['meta+esc', 'meta+q', 'esc']
       })
     })
 
@@ -35,7 +35,7 @@ describe('Keyboard', () => {
         previous: ['alt+`', 'alt+up', 'up'],
         activate: 'alt+tab',
         select: ['alt+enter', 'enter'],
-        cancel: ['alt+esc', 'esc']
+        cancel: ['alt+esc', 'alt+q', 'esc']
       })
     })
   })

@@ -1,18 +1,25 @@
-function template (subs) {
-  return subs.tabs.map((tab) => {
-    return `
+import { isValidFaviconUrl, DEFAULT_FAVICON } from '../utils.js'
+
+function template(subs) {
+  return subs.tabs
+    .map((tab) => {
+      const faviconUrl = tab.faviconUrl ?? DEFAULT_FAVICON
+      return `
 <div class="TAS_tabCon" data-tab-id="${tab.id}">
-  <div class="TAS_tabIcon" style="background-image: url(&quot;${tab.faviconUrl}&quot;);"></div>
+  <div class="TAS_tabIcon">
+    <img src="${faviconUrl}" width="16" height="16" class="TAS_favicon">
+  </div>
   <div title="${tab.title}" class="TAS_tabTitle">
     <div class="TAS_tabTitleText">${tab.title}</div>
   </div>
 </div>
 `
-  }).join('')
+    })
+    .join('')
 }
 
 export default class List {
-  constructor (eventEmitter) {
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter
     this.root = undefined
     this.tabs = undefined
@@ -31,21 +38,19 @@ export default class List {
     }
   }
 
-  deactivate () {
+  deactivate() {
     this.eventEmitter.removeListener('keyboard:next', this.nextListener)
     this.eventEmitter.removeListener('keyboard:previous', this.previousListener)
     this.eventEmitter.removeListener('keyboard:select', this.selectListener)
-    // delete this.tabs;
-    // delete this.cursor;
   }
 
-  highlightTab (tab) {
+  highlightTab(tab) {
     this.tabs[this.cursor].tabCon.classList.remove('TAS_highlighted')
     this.cursor = tab.cursor
     this.tabs[this.cursor].tabCon.classList.add('TAS_highlighted')
   }
 
-  highlightNextTab () {
+  highlightNextTab() {
     let searching = true
     const originalCursor = this.cursor
     let newCursor = this.cursor
@@ -60,7 +65,7 @@ export default class List {
     this.highlightTab(this.tabs[newCursor])
   }
 
-  highlightPreviousTab () {
+  highlightPreviousTab() {
     let searching = true
     const originalCursor = this.cursor
     let newCursor = this.cursor
@@ -75,22 +80,22 @@ export default class List {
     this.highlightTab(this.tabs[newCursor])
   }
 
-  selectHighlightedTab () {
+  selectHighlightedTab() {
     chrome.runtime.sendMessage({ selectTab: this.tabs[this.cursor] })
   }
 
-  templateTabs () {
+  templateTabs() {
     return this.tabs.map((tab) => {
       return {
         id: tab.id,
         title: tab.title,
         url: tab.url,
-        faviconUrl: tab.favIconDataUrl || (tab.favIconUrl && tab.favIconUrl.indexOf('chrome://theme/') !== 0 ? tab.favIconUrl : '')
+        faviconUrl: isValidFaviconUrl(tab.favIconUrl) ? tab.favIconUrl : null
       }
     })
   }
 
-  render (tabs) {
+  render(tabs) {
     this.tabs = tabs
     this.cursor = 0
     this.eventEmitter.on('keyboard:next', this.nextListener)
@@ -112,6 +117,30 @@ export default class List {
         this.selectHighlightedTab()
         this.eventEmitter.emit('list:select')
       })
+
+      // Add handlers for favicon images
+      const faviconImg = tabCon.querySelector('.TAS_favicon')
+      if (faviconImg) {
+        // Fade in when favicon loads successfully
+        faviconImg.addEventListener('load', function () {
+          this.classList.add('TAS_favicon-loaded')
+        })
+
+        // Show default icon on load failure
+        faviconImg.addEventListener('error', function () {
+          // Only replace once to avoid infinite loops
+          if (this.src !== DEFAULT_FAVICON) {
+            this.src = DEFAULT_FAVICON
+            // Fade in the default icon too
+            this.classList.add('TAS_favicon-loaded')
+          }
+        })
+
+        // If image is already loaded (from cache), add class immediately
+        if (faviconImg.complete && faviconImg.naturalHeight !== 0) {
+          faviconImg.classList.add('TAS_favicon-loaded')
+        }
+      }
 
       tab.cursor = i
       tab.tabCon = tabCon

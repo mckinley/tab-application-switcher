@@ -1,7 +1,7 @@
 import defaultOptions from './../default-options.js'
 import characterFromEvent from 'combokeys/helpers/characterFromEvent.js'
 
-function template (subs) {
+function template(subs) {
   return `
 <div class="TAS_keys">
   <div class="TAS_keyCon">
@@ -28,7 +28,7 @@ function template (subs) {
 }
 
 export default class Options {
-  constructor (eventEmitter) {
+  constructor(eventEmitter) {
     this.eventEmitter = eventEmitter
     this.active = false
     this.keyListener = undefined
@@ -37,20 +37,20 @@ export default class Options {
     this.os = navigator.platform.indexOf('Mac') > -1 ? 'mac' : 'windows'
   }
 
-  activate () {
+  activate() {
     if (this.active) return
 
     this.active = true
   }
 
-  deactivate () {
+  deactivate() {
     if (!this.active) return
 
     this.recordKeyStop()
     this.active = false
   }
 
-  storageObject () {
+  storageObject() {
     const keyModifier = this.root.querySelector('.TAS_keyModifier').textContent
     const keyNext = this.root.querySelector('.TAS_keyNext').textContent
     const keyPrevious = this.root.querySelector('.TAS_keyPrevious').textContent
@@ -66,7 +66,7 @@ export default class Options {
     return storage
   }
 
-  save () {
+  save() {
     const status = this.root.querySelector('.TAS_status')
     this.recordKeyStop()
     chrome.storage.sync.set(this.storageObject(), () => {
@@ -78,21 +78,21 @@ export default class Options {
     })
   }
 
-  recordKeyStart (element) {
+  recordKeyStart(element) {
     this.recordKeyStop()
     this.recordingElement = element
     this.recordingElement.classList.add('recording')
     this.recordingElement.addEventListener('keydown', this.keyListener)
   }
 
-  recordKeyStop () {
+  recordKeyStop() {
     if (!this.recordingElement) return
     this.recordingElement.removeEventListener('keydown', this.keyListener)
     this.recordingElement.classList.remove('recording')
     this.recordingElement = undefined
   }
 
-  render () {
+  render() {
     this.root = document.createElement('div')
     this.root.classList.add('TAS_options')
 

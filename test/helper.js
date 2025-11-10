@@ -1,9 +1,9 @@
-import chai from 'chai'
+import { expect } from 'chai'
 import sinon from 'sinon'
 import sinonChrome from 'sinon-chrome'
 import 'jsdom-global/register.js'
 
-function setGlobal (property, value) {
+function setGlobal(property, value) {
   if (global[property] === undefined) {
     global[property] = value
   }
@@ -11,13 +11,12 @@ function setGlobal (property, value) {
 
 before(() => {
   setGlobal('chrome', sinonChrome)
-  setGlobal('expect', chai.expect)
+  setGlobal('expect', expect)
   setGlobal('sinon', sinon)
 
   chrome.runtime.connect.returns({
     onDisconnect: {
-      addListener: () => {
-      }
+      addListener: () => {}
     }
   })
 })

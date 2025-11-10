@@ -31,10 +31,18 @@
       width: 16px;
       top: 8px;
       left: 8px;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-color: white;
+
+      img {
+        display: block;
+        width: 16px;
+        height: 16px;
+        opacity: 0;
+        transition: opacity 0.2s ease-in;
+
+        &.TAS_favicon-loaded {
+          opacity: 1;
+        }
+      }
     }
   }
 }
