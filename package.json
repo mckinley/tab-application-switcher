@@ -17,33 +17,28 @@
     "pack": "bun run prep && vite build && bun scripts/pack.ts",
     "release": "bun scripts/release.ts"
   },
-  "dependencies": {
+  "devDependencies": {
     "@crxjs/vite-plugin": "^2.2.1",
     "@eslint/js": "^9.39.1",
     "@leeoniya/ufuzzy": "^1.0.19",
-    "@vitest/ui": "^4.0.8",
-    "archiver": "^7.0.1",
-    "combokeys": "^3.0.1",
-    "eslint": "^9.39.1",
-    "globals": "^16.5.0",
-    "happy-dom": "^20.0.10",
-    "jsdom": "^25.0.1",
-    "prettier": "^3.6.2",
-    "sinon": "^19.0.2",
-    "sinon-chrome": "^3.0.1",
-    "vite": "^7.2.2",
-    "vite-plugin-static-copy": "^3.1.4",
-    "vitest": "^4.0.8"
-  },
-  "devDependencies": {
     "@types/archiver": "^7.0.0",
     "@types/chrome": "^0.1.28",
     "@types/node": "^24.10.1",
     "@types/sinon": "^20.0.0",
     "@types/sinon-chrome": "^2.2.16",
-    "@typescript-eslint/eslint-plugin": "^8.46.4",
-    "@typescript-eslint/parser": "^8.46.4",
+    "@vitest/ui": "^4.0.8",
+    "archiver": "^7.0.1",
+    "combokeys": "^3.0.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "jsdom": "^27.2.0",
+    "prettier": "^3.6.2",
+    "sinon": "^21.0.0",
+    "sinon-chrome": "^3.0.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.4"
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.2",
+    "vite-plugin-static-copy": "^3.1.4",
+    "vitest": "^4.0.8"
   }
 }
