@@ -24,20 +24,20 @@ const rl = createInterface({
   output: process.stdout
 })
 
-function question(query) {
+function question(query: string): Promise<string> {
   return new Promise((resolve) => rl.question(query, resolve))
 }
 
-function exec(command, options = {}) {
+function exec(command: string, options: Record<string, unknown> = {}): void {
   try {
-    return execSync(command, { encoding: 'utf8', stdio: 'inherit', ...options })
+    execSync(command, { encoding: 'utf8', stdio: 'inherit', ...options })
   } catch (_error) {
     console.error(`\n❌ Command failed: ${command}`)
     process.exit(1)
   }
 }
 
-function execQuiet(command) {
+function execQuiet(command: string): string | null {
   try {
     return execSync(command, { encoding: 'utf8', stdio: 'pipe' }).trim()
   } catch (_error) {
@@ -45,7 +45,7 @@ function execQuiet(command) {
   }
 }
 
-function validateVersion(version) {
+function validateVersion(version: string): string {
   const semverRegex = /^\d+\.\d+\.\d+$/
   if (!semverRegex.test(version)) {
     console.error('❌ Invalid version format. Use semantic versioning (e.g., 1.2.3)')
@@ -54,22 +54,24 @@ function validateVersion(version) {
   return version
 }
 
-function getCurrentVersion() {
-  const manifest = JSON.parse(readFileSync('./app/manifest.json', 'utf8'))
+function getCurrentVersion(): string {
+  const manifestContent = readFileSync('./app/manifest.json', 'utf8')
+  const manifest = JSON.parse(manifestContent) as { version: string }
   return manifest.version
 }
 
-function updateVersion(newVersion) {
+function updateVersion(newVersion: string): void {
   // Update manifest.json
   const manifestPath = './app/manifest.json'
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  const manifestContent = readFileSync(manifestPath, 'utf8')
+  const manifest = JSON.parse(manifestContent) as { version: string }
   manifest.version = newVersion
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n')
 
   console.log(`✅ Updated manifest.json to version ${newVersion}`)
 }
 
-function checkGitStatus() {
+function checkGitStatus(): void {
   const status = execQuiet('git status --porcelain')
   if (status) {
     console.error('❌ Working directory is not clean. Commit or stash your changes first.')
@@ -79,7 +81,7 @@ function checkGitStatus() {
   }
 }
 
-function checkGitRemote() {
+function checkGitRemote(): string {
   const remote = execQuiet('git remote get-url origin')
   if (!remote) {
     console.error('❌ No git remote found. Add a remote first.')
@@ -88,7 +90,7 @@ function checkGitRemote() {
   return remote
 }
 
-async function main() {
+async function main(): Promise<void> {
   console.log('🚀 Tab Application Switcher Release Script\n')
 
   // Get version from command line or prompt
@@ -131,7 +133,7 @@ async function main() {
 
   console.log('\n4️⃣  Building extension...')
   exec('npm run build')
-  exec('node scripts/pack.js')
+  exec('bun scripts/pack.ts')
 
   console.log('\n5️⃣  Committing version bump...')
   exec('git add app/manifest.json')
@@ -158,7 +160,7 @@ async function main() {
   console.log('')
 }
 
-main().catch((error) => {
+void main().catch((error: Error) => {
   console.error('❌ Release failed:', error.message)
   process.exit(1)
 })

@@ -1,32 +1,40 @@
 import js from '@eslint/js'
 import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
-export default [
+export default tseslint.config(
   js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
   {
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.webextensions,
-        chrome: 'readonly'
+        ...globals.webextensions
+      },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
       }
     },
     rules: {
-      // Modern JS
-      'no-var': 'error',
-      'prefer-const': 'error',
-
-      // No semicolons
       semi: ['error', 'never'],
-
-      // Allow unused vars prefixed with _
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }]
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
+        }
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn'
     }
   },
   {
-    ignores: ['dist/**', 'package/**', 'node_modules/**']
+    files: ['**/*.js'],
+    ...tseslint.configs.disableTypeChecked
+  },
+  {
+    ignores: ['dist/**', 'package/**']
   }
-]
+)

@@ -1,5 +1,11 @@
 import { isRestrictedChromeUrl } from '../utils.js'
 
+interface Manifest {
+  content_scripts?: Array<{
+    js: string[]
+  }>
+}
+
 export default class Connection {
   constructor() {
     // Required for onDisconnect in content scripts to execute only when reload occurs.
@@ -9,16 +15,21 @@ export default class Connection {
     // On install/update/reload, force re-injection (old content scripts are orphaned)
     chrome.runtime.onInstalled.addListener(() => {
       console.log('[TAS] Extension installed/updated/reloaded - re-injecting content scripts')
-      this.executeContentScripts(true) // Force injection, skip ping check
+      void this.executeContentScripts(true) // Force injection, skip ping check
     })
 
     // On service worker startup (wake from idle), check before injecting
-    this.executeContentScripts(false) // Check with ping first
+    void this.executeContentScripts(false) // Check with ping first
   }
 
-  async executeContentScripts(forceInject = false) {
-    const manifest = chrome.runtime.getManifest()
-    const scripts = manifest.content_scripts[0].js
+  async executeContentScripts(forceInject = false): Promise<void> {
+    const manifest = chrome.runtime.getManifest() as Manifest
+    const scripts = manifest.content_scripts?.[0]?.js
+
+    if (!scripts) {
+      console.error('[TAS] No content scripts found in manifest')
+      return
+    }
 
     try {
       const tabs = await chrome.tabs.query({})
@@ -29,10 +40,12 @@ export default class Connection {
           continue
         }
 
+        if (!tab.id) continue
+
         try {
           // If not forcing injection, check if content script is already there
           if (!forceInject) {
-            let response = null
+            let response: { pong?: boolean } | null = null
             try {
               response = await chrome.tabs.sendMessage(tab.id, { ping: true })
             } catch (_pingError) {
@@ -40,7 +53,7 @@ export default class Connection {
               response = null
             }
 
-            if (response && response.pong) {
+            if (response?.pong) {
               // Content script already exists, skip injection
               console.log('[TAS] Content script already injected in tab:', tab.id)
               continue
@@ -55,8 +68,9 @@ export default class Connection {
           })
         } catch (error) {
           // Content script might not be accessible
-          if (!error.message.includes('Cannot access') && !error.message.includes('Receiving end does not exist')) {
-            console.log('[TAS] Could not inject content script in tab:', tab.id, error.message)
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          if (!errorMessage.includes('Cannot access') && !errorMessage.includes('Receiving end does not exist')) {
+            console.log('[TAS] Could not inject content script in tab:', tab.id, errorMessage)
           }
         }
       }

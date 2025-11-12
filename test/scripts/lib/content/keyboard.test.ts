@@ -1,20 +1,35 @@
 import { describe, it, expect } from 'vitest'
 import Keyboard from '../../../../app/scripts/lib/content/keyboard.js'
-import EventEmitter from 'events'
 import defaultOptions from '../../../../app/scripts/lib/default-options.js'
+import type { ICoordinator } from '../../../../app/scripts/lib/types.js'
 
 describe('Keyboard', () => {
   describe('initKeys', () => {
-    function platform(value) {
+    function platform(value: string): void {
       Object.defineProperty(navigator, 'platform', {
         value,
         configurable: true
       })
     }
 
+    // Mock coordinator
+    const mockCoordinator: ICoordinator = {
+      handleActivate: () => {},
+      handleNext: () => {},
+      handlePrevious: () => {},
+      handleSelect: () => {},
+      handleCancel: () => {},
+      handleDeactivate: () => {},
+      handleSearch: () => {},
+      handleShowOptions: () => {},
+      getTabs: () => Promise.resolve([]),
+      selectTab: () => {},
+      destroy: () => {}
+    }
+
     it('sets windows keys from storage', () => {
       platform('Win32')
-      const keyboard = new Keyboard(new EventEmitter())
+      const keyboard = new Keyboard(mockCoordinator)
       keyboard.initKeys(defaultOptions.keys)
       expect(keyboard.keys).toEqual({
         modifier: 'meta',
@@ -28,7 +43,7 @@ describe('Keyboard', () => {
 
     it('sets mac keys from storage', () => {
       platform('MacIntel')
-      const keyboard = new Keyboard(new EventEmitter())
+      const keyboard = new Keyboard(mockCoordinator)
       keyboard.initKeys(defaultOptions.keys)
       expect(keyboard.keys).toEqual({
         modifier: 'alt',

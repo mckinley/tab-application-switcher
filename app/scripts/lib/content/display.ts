@@ -1,6 +1,7 @@
 import Options from './options.js'
 import Search from './search.js'
 import List from './list.js'
+import type { ICoordinator, Tab } from '../types.js'
 
 const template = `
 <style>
@@ -29,8 +30,20 @@ const template = `
 `
 
 export default class Display {
-  constructor(eventEmitter, cssString) {
-    this.eventEmitter = eventEmitter
+  coordinator: ICoordinator
+  cssString: string
+  active: boolean
+  stylesheetId: string
+  root?: HTMLDivElement
+  shadowRoot?: ShadowRoot
+  options?: Options
+  tabs?: Tab[]
+  list: List
+  search: Search
+  private clickListener: (event: MouseEvent) => void
+
+  constructor(coordinator: ICoordinator, cssString: string) {
+    this.coordinator = coordinator
     this.cssString = cssString
     this.active = false
     this.stylesheetId = 'TAS_style'
@@ -39,52 +52,36 @@ export default class Display {
     this.options = undefined
     this.tabs = undefined
 
-    this.list = new List(this.eventEmitter)
-    this.search = new Search(this.eventEmitter)
-
-    this.eventEmitter.on('keyboard:activate', () => {
-      this.activate()
-    })
-
-    this.eventEmitter.on('keyboard:select', () => {
-      this.deactivate()
-    })
-
-    this.eventEmitter.on('list:select', () => {
-      this.deactivate()
-    })
-
-    this.eventEmitter.on('keyboard:cancel', () => {
-      this.deactivate()
-    })
+    this.list = new List(this.coordinator)
+    this.search = new Search(this.coordinator)
 
     // Store the click listener so we can remove it on destroy
-    this.clickListener = (event) => {
-      if (this.root && !this.root.contains(event.target)) {
-        this.deactivate()
+    this.clickListener = (event: MouseEvent) => {
+      if (this.root && !this.root.contains(event.target as Node)) {
+        this.coordinator.handleDeactivate()
       }
     }
     document.addEventListener('click', this.clickListener)
-
-    chrome.runtime.connect().onDisconnect.addListener(() => {
-      this.destroy()
-    })
   }
 
-  activate() {
+  async activate(): Promise<void> {
     if (this.active) return
 
-    this.getTabs(() => {
+    try {
+      this.tabs = await this.coordinator.getTabs()
       this.render()
-    })
-    this.active = true
+      this.active = true
+    } catch (error) {
+      console.error('Failed to activate display:', error)
+    }
   }
 
-  deactivate() {
+  deactivate(): void {
     if (!this.active) return
 
-    this.eventEmitter.emit('display:deactivate')
-    document.body.removeChild(this.root)
+    if (this.root) {
+      document.body.removeChild(this.root)
+    }
     this.list.deactivate()
     this.root = undefined
     this.shadowRoot = undefined
@@ -93,33 +90,19 @@ export default class Display {
     this.active = false
   }
 
-  destroy() {
-    this.deactivate()
+  destroy(): void {
+    if (this.active) {
+      this.deactivate()
+    }
     this.removeStylesheet()
 
     // Remove document click listener
     document.removeEventListener('click', this.clickListener)
-
-    // Remove all EventEmitter listeners
-    this.eventEmitter.removeAllListeners()
   }
 
-  getTabs(cb) {
-    chrome.runtime.sendMessage({ tabs: true }, (response) => {
-      if (chrome.runtime.lastError) {
-        console.error('Error getting tabs:', chrome.runtime.lastError)
-        return
-      }
-      if (!response || !response.tabs) {
-        console.error('No tabs in response:', response)
-        return
-      }
-      this.tabs = response.tabs
-      cb()
-    })
-  }
+  addStylesheet(): void {
+    if (!this.shadowRoot) return
 
-  addStylesheet() {
     const style = document.createElement('style')
     style.id = this.stylesheetId
     // Inject the CSS string directly into the shadow DOM
@@ -127,54 +110,71 @@ export default class Display {
     this.shadowRoot.prepend(style)
   }
 
-  removeStylesheet() {
+  removeStylesheet(): void {
     const existingStyle = document.getElementById(this.stylesheetId)
-    if (existingStyle) {
-      document.head.removeChild(existingStyle)
+    if (existingStyle && existingStyle.parentNode) {
+      existingStyle.parentNode.removeChild(existingStyle)
     }
   }
 
-  toggleOptions() {
-    if (this.options && this.options.active) {
+  toggleOptions(): void {
+    if (this.options?.active) {
       this.deactivateOptions()
     } else {
       this.activateOptions()
     }
   }
 
-  activateOptions() {
-    if (this.options && this.options.active) return
+  activateOptions(): void {
+    if (!this.shadowRoot) return
+    if (this.options?.active) return
 
     const element = this.shadowRoot.querySelector('.TAS_optionsCon')
+    if (!element) return
     element.classList.add('active')
+
     const icon = this.shadowRoot.querySelector('.TAS_optionsIcon')
-    icon.classList.add('active')
+    if (icon) {
+      icon.classList.add('active')
+    }
 
     if (!this.options) {
-      this.options = new Options(this.eventEmitter)
+      this.options = new Options(this.coordinator)
       element.appendChild(this.options.render())
     } else {
       this.options.activate()
     }
 
-    this.eventEmitter.emit('display:options')
+    this.coordinator.handleShowOptions()
   }
 
-  deactivateOptions() {
+  deactivateOptions(): void {
+    if (!this.shadowRoot || !this.options) return
     if (!this.options.active) return
 
     const element = this.shadowRoot.querySelector('.TAS_optionsCon')
-    element.classList.remove('active')
+    if (element) {
+      element.classList.remove('active')
+    }
+
     const icon = this.shadowRoot.querySelector('.TAS_optionsIcon')
-    icon.classList.remove('active')
+    if (icon) {
+      icon.classList.remove('active')
+    }
+
     this.options.deactivate()
   }
 
-  shadow() {
+  shadow(): ShadowRoot {
+    if (!this.root) {
+      throw new Error('Root element not initialized')
+    }
     return this.root.attachShadow({ mode: 'closed' })
   }
 
-  render() {
+  render(): void {
+    if (!this.tabs) return
+
     this.root = document.createElement('div')
     this.root.classList.add('TAS_displayCon')
     const shadow = this.shadow()
@@ -185,16 +185,29 @@ export default class Display {
     root.innerHTML = template
     shadow.appendChild(root)
 
-    shadow.querySelector('.TAS_listCon').appendChild(this.list.render(this.tabs))
-    shadow.querySelector('.TAS_searchCon').appendChild(this.search.render(this.tabs, this.list))
+    const listCon = shadow.querySelector('.TAS_listCon')
+    if (listCon) {
+      listCon.appendChild(this.list.render(this.tabs))
+    }
 
-    shadow.querySelector('.TAS_displayControlClose').addEventListener('click', () => {
-      this.deactivate()
-    })
+    const searchCon = shadow.querySelector('.TAS_searchCon')
+    if (searchCon) {
+      searchCon.appendChild(this.search.render(this.tabs, this.list))
+    }
 
-    shadow.querySelector('.TAS_optionsControl').addEventListener('click', () => {
-      this.toggleOptions()
-    })
+    const closeControl = shadow.querySelector('.TAS_displayControlClose')
+    if (closeControl) {
+      closeControl.addEventListener('click', () => {
+        this.coordinator.handleDeactivate()
+      })
+    }
+
+    const optionsControl = shadow.querySelector('.TAS_optionsControl')
+    if (optionsControl) {
+      optionsControl.addEventListener('click', () => {
+        this.toggleOptions()
+      })
+    }
 
     this.shadowRoot = shadow
 

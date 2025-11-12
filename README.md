@@ -199,3 +199,44 @@ This project uses [Vite](https://vitejs.dev/) with the [@crxjs/vite-plugin](http
 - **Chrome Extension Support**: Automatic manifest processing and content script handling
 - **Testing**: Vitest for fast, Vite-native unit testing with jsdom
 - **Code Quality**: ESLint for linting and Prettier for formatting
+
+## Architecture
+
+This extension is built with **TypeScript** and uses the **Coordinator Pattern** for managing component interactions.
+
+### Coordinator Pattern
+
+Instead of using event emitters or pub/sub patterns, we use coordinator classes that orchestrate all interactions between components through direct method calls. This provides:
+
+- **Type Safety**: Full TypeScript type checking for all component interactions
+- **Explicit Flow**: Easy to trace how actions flow through the system
+- **Better Debugging**: Clear call stacks instead of event chains
+- **Simpler Testing**: Direct method calls are easier to mock and test
+
+### Component Structure
+
+**Content Scripts** (`app/scripts/content.ts`):
+
+- **ContentCoordinator**: Central orchestrator for the tab switcher UI
+  - Manages: `Keyboard`, `Display`, `List`, `Search`, `Options`
+  - Handles: Chrome runtime messaging, user actions, component lifecycle
+  - Methods: `handleActivate()`, `handleNext()`, `handlePrevious()`, `handleSelect()`, etc.
+
+**Background Scripts** (`app/scripts/background.ts`):
+
+- **BackgroundCoordinator**: Orchestrates background services
+  - Manages: `Tabs`, `Omnibox`
+  - Handles: Cross-component communication
+- **Connection**: Manages content script injection and reconnection on extension reload
+
+**Popup/Options** (`app/scripts/popup.ts`, `app/scripts/options.ts`):
+
+- **PopupCoordinator** / **OptionsCoordinator**: Manage their respective UIs
+  - Similar pattern to ContentCoordinator but for popup/options pages
+
+### Key Principles
+
+1. **Single Coordinator per Context**: Each execution context (content script, background, popup, options) has one coordinator
+2. **Dependency Injection**: Components receive their coordinator in the constructor
+3. **No Direct Component Communication**: Components only talk to their coordinator, never to each other
+4. **Coordinator Handles Chrome APIs**: All `chrome.*` API calls go through coordinators, keeping components pure

@@ -1,12 +1,16 @@
 import uFuzzy from '@leeoniya/ufuzzy'
+import type { Tab, IBackgroundCoordinator } from '../types.js'
 
 export default class Omnibox {
-  constructor(eventEmitter) {
-    this.eventEmitter = eventEmitter
+  coordinator: IBackgroundCoordinator
+  tabs: Tab[]
+  fuzzy: uFuzzy
+
+  constructor(coordinator: IBackgroundCoordinator) {
+    this.coordinator = coordinator
     this.tabs = []
 
     // Initialize uFuzzy with same settings as search
-
     this.fuzzy = new uFuzzy({
       intraMode: 1,
       intraIns: 1,
@@ -25,28 +29,36 @@ export default class Omnibox {
 
     chrome.omnibox.onInputEntered.addListener((text, _disposition) => {
       const tab = this.findTab(text) || this.matchedTabs(text)[0]
-      if (tab) this.eventEmitter.emit('omnibox:select-tab', tab)
+      if (tab) this.coordinator.handleOmniboxSelectTab(tab)
     })
   }
 
-  getTabs() {
+  getTabs(): void {
     this.tabs = []
     chrome.windows.getAll({ populate: true }, (windows) => {
       windows.forEach((w) => {
-        this.tabs = this.tabs.concat(w.tabs)
+        if (w.tabs) {
+          this.tabs = this.tabs.concat(w.tabs)
+        }
       })
     })
   }
 
-  suggest(text, suggest) {
-    const suggestions = []
+  suggest(text: string, suggest: (suggestions: chrome.omnibox.SuggestResult[]) => void): void {
+    const suggestions: chrome.omnibox.SuggestResult[] = []
     const matchedTabs = this.matchedTabs(text)
+
     matchedTabs.forEach((tab) => {
-      suggestions.push({ content: tab.url, description: `tab: <match>${this.encodeXml(tab.title)}</match>` })
+      if (tab.url && tab.title) {
+        suggestions.push({
+          content: tab.url,
+          description: `tab: <match>${this.encodeXml(tab.title)}</match>`
+        })
+      }
     })
 
     if (suggestions.length > 0) {
-      chrome.omnibox.setDefaultSuggestion({ description: suggestions[0].description })
+      void chrome.omnibox.setDefaultSuggestion({ description: suggestions[0].description })
       suggestions.shift()
     }
 
@@ -55,28 +67,28 @@ export default class Omnibox {
     }
   }
 
-  matchedTabs(text) {
+  matchedTabs(text: string): Tab[] {
     if (!text) return this.tabs
 
     // Build haystack from tab titles and URLs
-    const haystack = this.tabs.map((tab) => `${tab.title} ${tab.url}`)
+    const haystack = this.tabs.map((tab) => `${tab.title ?? ''} ${tab.url ?? ''}`)
 
     // Search using uFuzzy
     const idxs = this.fuzzy.filter(haystack, text)
 
     // Return matched tabs
     if (idxs && idxs.length > 0) {
-      return idxs.map((idx) => this.tabs[idx])
+      return idxs.map((idx) => this.tabs[idx]).filter((tab): tab is Tab => tab !== undefined)
     }
 
     return []
   }
 
-  findTab(url) {
+  findTab(url: string): Tab | undefined {
     return this.tabs.find((tab) => tab && tab.url === url)
   }
 
-  encodeXml(s) {
+  encodeXml(s: string): string {
     // Service workers don't have access to DOM, so we need to manually encode
     return s
       .replace(/&/g, '&amp;')

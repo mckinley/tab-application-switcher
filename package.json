@@ -11,11 +11,11 @@
     "test:ui": "vitest --ui",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"**/*.{js,json,md,html,css}\"",
-    "format:check": "prettier --check \"**/*.{js,json,md,html,css}\"",
-    "prep": "npm run lint:fix && npm run format && npm test",
-    "pack": "npm run prep && vite build && node scripts/pack.js",
-    "release": "node scripts/release.js"
+    "format": "prettier --write \"**/*.{js,ts,json,md,html,css}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,json,md,html,css}\"",
+    "prep": "bun run lint:fix && bun run format && bun run test",
+    "pack": "bun run prep && vite build && bun scripts/pack.ts",
+    "release": "bun scripts/release.ts"
   },
   "dependencies": {
     "@crxjs/vite-plugin": "^2.2.1",
@@ -34,5 +34,16 @@
     "vite": "^7.2.2",
     "vite-plugin-static-copy": "^3.1.4",
     "vitest": "^4.0.8"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/chrome": "^0.1.28",
+    "@types/node": "^24.10.1",
+    "@types/sinon": "^20.0.0",
+    "@types/sinon-chrome": "^2.2.16",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
   }
 }

@@ -8,7 +8,8 @@ const rootDir = path.resolve(__dirname, '..')
 
 // Read manifest to get version
 const manifestPath = path.join(rootDir, 'dist', 'manifest.json')
-const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+const manifestContent = fs.readFileSync(manifestPath, 'utf8')
+const manifest = JSON.parse(manifestContent) as { version: string }
 const version = manifest.version
 
 // Create package directory if it doesn't exist
@@ -32,4 +33,4 @@ archive.on('error', (err) => {
 
 archive.pipe(output)
 archive.directory(path.join(rootDir, 'dist'), false)
-archive.finalize()
+void archive.finalize()

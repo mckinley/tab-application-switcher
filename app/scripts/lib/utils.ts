@@ -8,7 +8,7 @@ export const DEFAULT_FAVICON =
 /**
  * Escape HTML special characters to prevent XSS attacks
  */
-export function escapeHtml(text) {
+export function escapeHtml(text: string | null | undefined): string {
   if (!text) return ''
   const div = document.createElement('div')
   div.textContent = text
@@ -19,7 +19,7 @@ export function escapeHtml(text) {
  * Check if a favicon URL is valid and safe to load
  * Filters out URLs that will fail to load or cause CORS errors
  */
-export function isValidFaviconUrl(url) {
+export function isValidFaviconUrl(url: string | undefined): boolean {
   if (!url) return false
 
   return (
@@ -36,7 +36,7 @@ export function isValidFaviconUrl(url) {
  * Check if a URL is a restricted Chrome internal page
  * Content scripts cannot be injected into these pages
  */
-export function isRestrictedChromeUrl(url) {
+export function isRestrictedChromeUrl(url: string | undefined): boolean {
   if (!url) return true
 
   return (
