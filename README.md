@@ -62,26 +62,45 @@ npm install
 
 ### Development Mode
 
+Start the Vite development server with hot module replacement:
+
 ```bash
-npm start
-# or
-npx gulp dev
+npm run dev
 ```
+
+This will:
+
+- Build the extension in development mode
+- Watch for file changes and rebuild automatically
+- Enable hot module replacement for instant updates
+- Output to the `dist` directory
 
 ### Load Extension in Chrome
 
-1. Run the build: `npm start` or `npx gulp build`
+1. Run the dev server: `npm run dev`
 2. Open `chrome://extensions/`
 3. Enable "Developer mode"
 4. Click "Load unpacked extension"
 5. Select the `dist` directory
 6. For service worker debugging, click "service worker" link in the extension card
 
-### Type Checking
+The extension will automatically reload when you make changes to the code.
 
-```bash
-npm run typecheck
-```
+### Available Scripts
+
+- `npm run dev` - Start development server with HMR
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm test` - Run tests once with Vitest
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:ui` - Run tests with Vitest UI
+- `npm run lint` - Check code style with ESLint
+- `npm run lint:fix` - Auto-fix code style issues
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
+- `npm run prep` - Run lint:fix, format, and test (pre-deployment check)
+- `npm run pack` - Run prep, build, and create distribution zip
+- `npm run release` - Interactive release script (creates tag, builds, and guides through GitHub release)
 
 ## Distribution
 
@@ -89,14 +108,94 @@ npm run typecheck
 
 ```bash
 npm run build
-# or
-npx gulp pack
 ```
+
+This creates an optimized production build in the `dist` directory.
+
+### Create Distribution Package
+
+```bash
+npm run pack
+```
+
+This will:
+
+1. Run linting and formatting checks
+2. Run tests
+3. Build for production
+4. Create a versioned zip file in the `package` directory
 
 ### Publish
 
 1. Increment version in `app/manifest.json`
-2. Run `npm run build`
+2. Run `npm run pack`
 3. Upload `package/tab-application-switcher-x.x.x.zip` to:
    - [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard)
    - [Microsoft Edge Add-ons](https://partner.microsoft.com/en-us/dashboard/microsoftedge/fe1f2d5b-8edd-437a-bd83-daeddebedfca/packages/overview)
+
+## Releasing
+
+This project uses a streamlined release workflow:
+
+### Quick Release
+
+```bash
+npm run release
+```
+
+This interactive script will:
+
+1. Validate your working directory is clean
+2. Run tests and linting
+3. Prompt for the new version number
+4. Update `manifest.json`
+5. Build and package the extension
+6. Create a git commit and tag
+7. Provide instructions for pushing and creating a GitHub Release
+
+### Manual Release Steps
+
+If you prefer to do it manually:
+
+```bash
+# 1. Update version in manifest.json
+# 2. Run tests and build
+npm run pack
+
+# 3. Commit and tag
+git add app/manifest.json
+git commit -m "chore: bump version to 1.2.3"
+git tag -a v1.2.3 -m "Release v1.2.3"
+
+# 4. Push
+git push origin main
+git push origin v1.2.3
+
+# 5. Create GitHub Release at github.com/your-repo/releases/new
+# 6. Upload package/tab-application-switcher-1.2.3.zip
+```
+
+### Automated GitHub Releases
+
+When you push a tag (e.g., `v1.2.3`), GitHub Actions will automatically:
+
+- Run tests and linting
+- Build the extension
+- Create a GitHub Release with the zip file attached
+- Generate release notes from commits
+
+### Version History
+
+- **Git Tags**: All versions are tagged in git (e.g., `v0.1.0`)
+- **GitHub Releases**: Download any version from the [Releases page](../../releases)
+- **CHANGELOG.md**: Human-readable changelog following [Keep a Changelog](https://keepachangelog.com/)
+
+## Build System
+
+This project uses [Vite](https://vitejs.dev/) with the [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin) for building the Chrome extension. Key features:
+
+- **Fast Development**: Near-instant hot module replacement (HMR)
+- **Modern Tooling**: Native ES modules and optimized builds
+- **Chrome Extension Support**: Automatic manifest processing and content script handling
+- **Testing**: Vitest for fast, Vite-native unit testing with jsdom
+- **Code Quality**: ESLint for linting and Prettier for formatting

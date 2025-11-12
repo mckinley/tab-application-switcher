@@ -93,7 +93,7 @@ export default class Tabs {
         this.unshiftTab(focused.tabs.find((tab) => tab.active))
       }
 
-      // Emit event for favicon preloading
+      // Emit event for tab updates
       this.eventEmitter.emit('tabs:updated', this.tabs)
     })
   }

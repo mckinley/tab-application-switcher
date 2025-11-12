@@ -29,8 +29,9 @@ const template = `
 `
 
 export default class Display {
-  constructor(eventEmitter) {
+  constructor(eventEmitter, cssString) {
     this.eventEmitter = eventEmitter
+    this.cssString = cssString
     this.active = false
     this.stylesheetId = 'TAS_style'
     this.root = undefined
@@ -121,7 +122,8 @@ export default class Display {
   addStylesheet() {
     const style = document.createElement('style')
     style.id = this.stylesheetId
-    style.appendChild(document.createTextNode('@import "' + chrome.runtime.getURL('styles/main.css') + '";'))
+    // Inject the CSS string directly into the shadow DOM
+    style.textContent = this.cssString
     this.shadowRoot.prepend(style)
   }
 

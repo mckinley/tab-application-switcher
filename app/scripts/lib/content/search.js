@@ -15,7 +15,7 @@ export default class Search {
     this.list = undefined
 
     // Initialize uFuzzy with optimized settings for tab search
-    // eslint-disable-next-line new-cap
+
     this.fuzzy = new uFuzzy({
       intraMode: 1, // Allow single typo per term
       intraIns: 1, // Allow 1 extra char between chars in a term

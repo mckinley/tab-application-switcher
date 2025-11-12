@@ -1,14 +1,14 @@
-import '../../../../test/helper.js'
+import { describe, it, expect } from 'vitest'
 import Display from '../../../../app/scripts/lib/content/display.js'
 import EventEmitter from 'events'
 
 describe('export', () => {
   it('exists', () => {
-    expect(Display).to.be.a('function')
+    expect(Display).toBeTypeOf('function')
   })
 })
 
-xdescribe('render', () => {
+describe.skip('render', () => {
   it('only selects tab once after multiple renders', () => {
     chrome.reset()
 
@@ -20,10 +20,6 @@ xdescribe('render', () => {
       cb()
     }
 
-    // display.shadow = () => {
-    //   return document.createElement('div');
-    // };
-
     display.activate()
     eventEmitter.emit('keyboard:select')
     display.activate()
@@ -31,6 +27,6 @@ xdescribe('render', () => {
     display.activate()
     eventEmitter.emit('keyboard:select')
 
-    expect(chrome.runtime.sendMessage.callCount).equal(3)
+    expect(chrome.runtime.sendMessage.callCount).toBe(3)
   })
 })

@@ -3,52 +3,36 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "gulp dev",
-    "test": "gulp test",
-    "lint": "gulp lint",
-    "lint:fix": "gulp lintFix",
-    "format": "prettier --write \"**/*.{js,json,md,html,css,scss}\"",
-    "format:check": "prettier --check \"**/*.{js,json,md,html,css,scss}\"",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json,md,html,css}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md,html,css}\"",
     "prep": "npm run lint:fix && npm run format && npm test",
-    "build": "gulp pack"
+    "pack": "npm run prep && vite build && node scripts/pack.js",
+    "release": "node scripts/release.js"
   },
   "dependencies": {
+    "@crxjs/vite-plugin": "^2.2.1",
+    "@eslint/js": "^9.39.1",
     "@leeoniya/ufuzzy": "^1.0.19",
-    "@rollup/plugin-commonjs": "^28.0.1",
-    "@rollup/plugin-node-resolve": "^15.3.0",
-    "@rollup/plugin-strip": "^3.0.4",
-    "@rollup/plugin-terser": "^0.4.4",
-    "chai": "^5.1.2",
+    "@vitest/ui": "^4.0.8",
+    "archiver": "^7.0.1",
     "combokeys": "^3.0.1",
-    "del": "^7.1.0",
-    "fast-glob": "^3.3.2",
-    "gulp": "^5.0.0",
-    "gulp-mocha": "^10.0.0",
-    "gulp-sass": "^5.1.0",
-    "gulp-standard": "^14.0.0",
-    "gulp-zip": "^6.0.0",
-    "gulplog": "^2.2.0",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "happy-dom": "^20.0.10",
     "jsdom": "^25.0.1",
-    "jsdom-global": "^3.0.2",
-    "mocha": "^10.8.2",
     "prettier": "^3.6.2",
-    "rollup": "^4.28.1",
-    "rollup-plugin-modify": "^3.0.0",
-    "rollup-plugin-node-polyfills": "^0.2.1",
-    "sass": "^1.81.0",
     "sinon": "^19.0.2",
     "sinon-chrome": "^3.0.1",
-    "ws": "^8.18.0"
-  },
-  "standard": {
-    "env": {
-      "browser": true,
-      "node": true,
-      "mocha": true,
-      "webextensions": true
-    },
-    "globals": [
-      "expect"
-    ]
+    "vite": "^7.2.2",
+    "vite-plugin-static-copy": "^3.1.4",
+    "vitest": "^4.0.8"
   }
 }

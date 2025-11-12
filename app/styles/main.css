@@ -1,0 +1,247 @@
+/* Shadow DOM host reset */
+:host {
+  all: initial;
+}
+
+/* Font face */
+@font-face {
+  font-family: 'Roboto';
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/RobotoTTF/Roboto-Regular.ttf');
+}
+
+/* Remove focus outline */
+*:focus {
+  outline: none;
+}
+
+/* Main display container */
+.TAS_display {
+  display: block !important;
+  color: #696969;
+  position: fixed;
+  overflow: auto;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100%;
+  z-index: 99999999999999999999;
+  background-color: #fcfcfc;
+  border-left: solid 8px #f1f1f1;
+  font-size: 12px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.TAS_display .TAS_displayControlClose {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  padding: 7px;
+  cursor: pointer;
+}
+
+.TAS_display .TAS_displayIconClose {
+  width: 16px;
+  height: 16px;
+  fill: #d4d4d4;
+}
+
+.TAS_display .TAS_optionsControl {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  z-index: 10;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.TAS_display .TAS_optionsIcon {
+  width: 16px;
+  height: 16px;
+  fill: #d4d4d4;
+  transition: fill 1s;
+}
+
+.TAS_display .TAS_optionsIcon.active {
+  fill: #fcfcfc;
+}
+
+.TAS_display .TAS_optionsCon {
+  width: 100%;
+  height: 0;
+  transition: height 0.5s;
+  right: 0;
+  top: 0;
+}
+
+.TAS_display .TAS_optionsCon.active {
+  height: 80px;
+}
+
+/* List styles */
+.TAS_listCon .TAS_tabCon {
+  position: relative;
+  border-bottom: solid 1px #f1f1f1;
+  border-top: solid 1px white;
+  background-color: white;
+  cursor: pointer;
+  height: 32px;
+  white-space: nowrap;
+  padding: 0 10px 0 30px;
+}
+
+.TAS_listCon .TAS_tabCon.TAS_highlighted {
+  background-color: #f1f1f1;
+  padding-right: 0;
+  border-right: solid 10px #d4d4d4;
+  border-top: solid 1px #e3e3e3;
+  border-bottom: solid 1px #e3e3e3;
+}
+
+.TAS_listCon .TAS_tabCon.TAS_highlighted .TAS_tabTitle {
+  color: #333;
+}
+
+.TAS_listCon .TAS_tabCon .TAS_tabTitle {
+  overflow: hidden;
+  line-height: 32px;
+  vertical-align: middle;
+}
+
+.TAS_listCon .TAS_tabCon .TAS_tabIcon {
+  -webkit-border-radius: 2px;
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  top: 8px;
+  left: 8px;
+}
+
+.TAS_listCon .TAS_tabCon .TAS_tabIcon img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
+.TAS_listCon .TAS_tabCon .TAS_tabIcon img.TAS_favicon-loaded {
+  opacity: 1;
+}
+
+/* Search styles */
+.TAS_searchCon {
+  background-color: #f1f1f1;
+  padding: 8px 22px 8px 0;
+  position: relative;
+}
+
+.TAS_searchCon .TAS_searchIcon {
+  width: 16px;
+  height: 16px;
+  fill: #d4d4d4;
+  position: absolute;
+  top: 26px;
+  left: 20px;
+}
+
+.TAS_searchCon .TAS_searchInput {
+  -webkit-appearance: none;
+  width: 100%;
+  outline: 0 !important;
+  font-size: 12px;
+  height: 50px;
+  margin: 0;
+  padding: 0 10px 0 30px;
+  border: solid 8px #f1f1f1;
+  border-radius: 25px;
+  caret-color: #a1a1a1;
+}
+
+.TAS_searchCon .TAS_searchInput::-webkit-input-placeholder {
+  color: #a1a1a1;
+  padding-left: 4px;
+}
+
+.TAS_searchCon .TAS_searchInput:focus {
+  color: #333;
+}
+
+/* Options styles */
+.TAS_options {
+  position: relative;
+  background-color: #404040;
+  text-align: center;
+  width: 400px;
+}
+
+.TAS_options .TAS_keys {
+  padding: 14px;
+}
+
+.TAS_options .TAS_keyCon {
+  display: inline-block;
+  width: 70px;
+  vertical-align: top;
+}
+
+.TAS_options .TAS_key {
+  display: inline-block;
+  width: 32px;
+  line-height: 32px;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.4);
+  background: #fff;
+  vertical-align: middle;
+  color: #404040;
+  cursor: pointer;
+}
+
+.TAS_options .TAS_key.recording {
+  color: #e3e3e3;
+}
+
+.TAS_options .TAS_label {
+  padding-top: 6px;
+  color: #e3e3e3;
+}
+
+.TAS_options .TAS_saveCon {
+  display: inline-block;
+  width: 120px;
+  vertical-align: top;
+}
+
+.TAS_options .TAS_save {
+  display: inline-block;
+  width: 60px;
+  line-height: 30px;
+  border-radius: 15px;
+  margin-left: 8px;
+  background: #e3e3e3;
+  color: #404040;
+  cursor: pointer;
+}
+
+.TAS_options .TAS_status {
+  opacity: 0;
+  transition: opacity 0.8s;
+  padding-top: 6px;
+  color: #e3e3e3;
+}
+
+.TAS_options .TAS_status.active {
+  opacity: 1;
+}
+
+/* Popup styles */
+.TAS_popup {
+  width: 408px;
+  height: 600px;
+}
+
+.TAS_popup body {
+  height: 600px;
+  overflow: hidden;
+  margin: 0;
+}

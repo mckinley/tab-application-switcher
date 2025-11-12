@@ -6,13 +6,17 @@ export default class Connection {
     // Without a listener, onDisconnect is called immediately.
     chrome.runtime.onConnect.addListener(() => {})
 
-    // In MV3, content scripts are automatically injected via manifest for new pages
-    // We need to inject into existing tabs whenever the service worker starts
-    // This handles: install, update, reload, and service worker wake from idle
-    this.executeContentScripts()
+    // On install/update/reload, force re-injection (old content scripts are orphaned)
+    chrome.runtime.onInstalled.addListener(() => {
+      console.log('[TAS] Extension installed/updated/reloaded - re-injecting content scripts')
+      this.executeContentScripts(true) // Force injection, skip ping check
+    })
+
+    // On service worker startup (wake from idle), check before injecting
+    this.executeContentScripts(false) // Check with ping first
   }
 
-  async executeContentScripts() {
+  async executeContentScripts(forceInject = false) {
     const manifest = chrome.runtime.getManifest()
     const scripts = manifest.content_scripts[0].js
 
@@ -26,23 +30,24 @@ export default class Connection {
         }
 
         try {
-          // Check if content script is already injected
-          // We do this by trying to send a message to the tab
-          let response = null
-          try {
-            response = await chrome.tabs.sendMessage(tab.id, { ping: true })
-          } catch (pingError) {
-            // Content script not injected or tab not accessible - this is expected
-            response = null
+          // If not forcing injection, check if content script is already there
+          if (!forceInject) {
+            let response = null
+            try {
+              response = await chrome.tabs.sendMessage(tab.id, { ping: true })
+            } catch (_pingError) {
+              // Content script not injected or tab not accessible - this is expected
+              response = null
+            }
+
+            if (response && response.pong) {
+              // Content script already exists, skip injection
+              console.log('[TAS] Content script already injected in tab:', tab.id)
+              continue
+            }
           }
 
-          if (response && response.pong) {
-            // Content script already exists, skip injection
-            console.log('[TAS] Content script already injected in tab:', tab.id)
-            continue
-          }
-
-          // Content script not found, inject it
+          // Content script not found or forcing injection, inject it
           console.log('[TAS] Injecting content script in tab:', tab.id)
           await chrome.scripting.executeScript({
             target: { tabId: tab.id, allFrames: false },

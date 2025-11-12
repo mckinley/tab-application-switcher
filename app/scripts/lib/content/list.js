@@ -122,24 +122,32 @@ export default class List {
       // Add handlers for favicon images
       const faviconImg = tabCon.querySelector('.TAS_favicon')
       if (faviconImg) {
-        // Fade in when favicon loads successfully
-        faviconImg.addEventListener('load', function () {
-          this.classList.add('TAS_favicon-loaded')
-        })
+        // Check if this is a data URL (like the default grey dot)
+        const isDataUrl = faviconImg.src.startsWith('data:')
 
-        // Show default icon on load failure
-        faviconImg.addEventListener('error', function () {
-          // Only replace once to avoid infinite loops
-          if (this.src !== DEFAULT_FAVICON) {
-            this.src = DEFAULT_FAVICON
-            // Fade in the default icon too
-            this.classList.add('TAS_favicon-loaded')
-          }
-        })
-
-        // If image is already loaded (from cache), add class immediately
-        if (faviconImg.complete && faviconImg.naturalHeight !== 0) {
+        // Data URLs should show immediately without fade-in
+        if (isDataUrl) {
           faviconImg.classList.add('TAS_favicon-loaded')
+        } else {
+          // Remote URLs: fade in when they load successfully
+          faviconImg.addEventListener('load', function () {
+            this.classList.add('TAS_favicon-loaded')
+          })
+
+          // Show default icon on load failure
+          faviconImg.addEventListener('error', function () {
+            // Only replace once to avoid infinite loops
+            if (this.src !== DEFAULT_FAVICON) {
+              this.src = DEFAULT_FAVICON
+              // Default icon is a data URL, show immediately
+              this.classList.add('TAS_favicon-loaded')
+            }
+          })
+
+          // If image is already loaded (from cache), add class immediately
+          if (faviconImg.complete && faviconImg.naturalHeight !== 0) {
+            faviconImg.classList.add('TAS_favicon-loaded')
+          }
         }
       }
 

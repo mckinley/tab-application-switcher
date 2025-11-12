@@ -6,7 +6,7 @@ export default class Omnibox {
     this.tabs = []
 
     // Initialize uFuzzy with same settings as search
-    // eslint-disable-next-line new-cap
+
     this.fuzzy = new uFuzzy({
       intraMode: 1,
       intraIns: 1,
