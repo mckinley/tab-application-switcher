@@ -1,7 +1,19 @@
+import uFuzzy from '@leeoniya/ufuzzy'
+
 export default class Omnibox {
   constructor(eventEmitter) {
     this.eventEmitter = eventEmitter
     this.tabs = []
+
+    // Initialize uFuzzy with same settings as search
+    // eslint-disable-next-line new-cap
+    this.fuzzy = new uFuzzy({
+      intraMode: 1,
+      intraIns: 1,
+      intraSub: 1,
+      intraTrn: 1,
+      intraDel: 1
+    })
 
     chrome.omnibox.onInputStarted.addListener(() => {
       this.getTabs()
@@ -43,18 +55,21 @@ export default class Omnibox {
     }
   }
 
-  match(text, tab) {
-    return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text))
-  }
-
   matchedTabs(text) {
-    const matchedTabs = []
-    this.tabs.forEach((tab) => {
-      if (this.match(text, tab)) {
-        matchedTabs.push(tab)
-      }
-    })
-    return matchedTabs
+    if (!text) return this.tabs
+
+    // Build haystack from tab titles and URLs
+    const haystack = this.tabs.map((tab) => `${tab.title} ${tab.url}`)
+
+    // Search using uFuzzy
+    const idxs = this.fuzzy.filter(haystack, text)
+
+    // Return matched tabs
+    if (idxs && idxs.length > 0) {
+      return idxs.map((idx) => this.tabs[idx])
+    }
+
+    return []
   }
 
   findTab(url) {

@@ -1,3 +1,5 @@
+import uFuzzy from '@leeoniya/ufuzzy'
+
 function template() {
   return `
 <input class="TAS_searchInput" type="search" placeholder="search page titles and urls">
@@ -11,25 +13,52 @@ export default class Search {
     this.root = undefined
     this.tabs = undefined
     this.list = undefined
-  }
 
-  filterTabs(value) {
-    let firstMatch
-    this.tabs.forEach((tab) => {
-      if (this.match(value, tab)) {
-        tab.tabCon.style.display = 'block'
-        if (!firstMatch) {
-          this.list.highlightTab(tab)
-          firstMatch = true
-        }
-      } else {
-        tab.tabCon.style.display = 'none'
-      }
+    // Initialize uFuzzy with optimized settings for tab search
+    // eslint-disable-next-line new-cap
+    this.fuzzy = new uFuzzy({
+      intraMode: 1, // Allow single typo per term
+      intraIns: 1, // Allow 1 extra char between chars in a term
+      intraSub: 1, // Allow substitutions
+      intraTrn: 1, // Allow transpositions
+      intraDel: 1 // Allow deletions
     })
   }
 
-  match(text, tab) {
-    return tab.title.match(new RegExp(text)) || tab.url.match(new RegExp(text))
+  filterTabs(value) {
+    if (!value) {
+      // Show all tabs when search is empty
+      this.tabs.forEach((tab) => {
+        tab.tabCon.style.display = 'block'
+      })
+      if (this.tabs.length > 0) {
+        this.list.highlightTab(this.tabs[0])
+      }
+      return
+    }
+
+    // Build haystack from tab titles and URLs
+    const haystack = this.tabs.map((tab) => `${tab.title} ${tab.url}`)
+
+    // Search using uFuzzy
+    const idxs = this.fuzzy.filter(haystack, value)
+
+    // Hide all tabs first
+    this.tabs.forEach((tab) => {
+      tab.tabCon.style.display = 'none'
+    })
+
+    // Show matching tabs
+    let firstMatch = false
+    if (idxs && idxs.length > 0) {
+      idxs.forEach((idx) => {
+        this.tabs[idx].tabCon.style.display = 'block'
+        if (!firstMatch) {
+          this.list.highlightTab(this.tabs[idx])
+          firstMatch = true
+        }
+      })
+    }
   }
 
   render(tabs, list) {

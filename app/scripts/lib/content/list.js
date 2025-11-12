@@ -1,16 +1,17 @@
-import { isValidFaviconUrl, DEFAULT_FAVICON } from '../utils.js'
+import { isValidFaviconUrl, DEFAULT_FAVICON, escapeHtml } from '../utils.js'
 
 function template(subs) {
   return subs.tabs
     .map((tab) => {
-      const faviconUrl = tab.faviconUrl ?? DEFAULT_FAVICON
+      const faviconUrl = escapeHtml(tab.faviconUrl ?? DEFAULT_FAVICON)
+      const escapedTitle = escapeHtml(tab.title)
       return `
 <div class="TAS_tabCon" data-tab-id="${tab.id}">
   <div class="TAS_tabIcon">
     <img src="${faviconUrl}" width="16" height="16" class="TAS_favicon">
   </div>
-  <div title="${tab.title}" class="TAS_tabTitle">
-    <div class="TAS_tabTitleText">${tab.title}</div>
+  <div title="${escapedTitle}" class="TAS_tabTitle">
+    <div class="TAS_tabTitleText">${escapedTitle}</div>
   </div>
 </div>
 `

@@ -14,7 +14,7 @@ import terser from '@rollup/plugin-terser'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
-import dartSass from 'sass'
+import * as dartSass from 'sass'
 import { WebSocketServer } from 'ws'
 
 const gulpSass = gulpSassBase(dartSass)

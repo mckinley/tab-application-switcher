@@ -24,7 +24,7 @@ export default class Keyboard {
 
     // Store the storage listener so we can remove it on destroy
     this.storageListener = (changes, _namespace) => {
-      if (changes.keys.newValue) {
+      if (changes.keys && changes.keys.newValue) {
         this.updateKeys(changes.keys.newValue)
       }
     }

@@ -1,6 +1,6 @@
-@import 'list';
-@import 'search';
-@import 'options';
+@use 'list';
+@use 'search';
+@use 'options';
 
 $font-name: 'Roboto';
 @font-face {

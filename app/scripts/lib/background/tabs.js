@@ -117,8 +117,13 @@ export default class Tabs {
   }
 
   replaceTab(oldId, newTab) {
-    this.tabs[this.tabs.indexOf(this.findTab(oldId))] = newTab
-    this.eventEmitter.emit('tabs:updated', this.tabs)
+    const oldTab = this.findTab(oldId)
+    if (!oldTab) return
+    const index = this.tabs.indexOf(oldTab)
+    if (index !== -1) {
+      this.tabs[index] = newTab
+      this.eventEmitter.emit('tabs:updated', this.tabs)
+    }
   }
 
   unshiftTab(tab) {
@@ -132,7 +137,12 @@ export default class Tabs {
   }
 
   removeTab(id) {
-    this.tabs.splice(this.tabs.indexOf(this.findTab(id)), 1)
-    this.eventEmitter.emit('tabs:updated', this.tabs)
+    const tab = this.findTab(id)
+    if (!tab) return
+    const index = this.tabs.indexOf(tab)
+    if (index !== -1) {
+      this.tabs.splice(index, 1)
+      this.eventEmitter.emit('tabs:updated', this.tabs)
+    }
   }
 }
