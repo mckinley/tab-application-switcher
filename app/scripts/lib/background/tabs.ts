@@ -45,6 +45,8 @@ export default class Tabs {
       }
     })
 
+    // TODO: Test if this is redundant with chrome.tabs.onActivated (line 71)
+    // Both might fire when switching windows, potentially calling unshiftTab twice
     chrome.windows.onFocusChanged.addListener(() => {
       chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
         if (tabs[0]) {
