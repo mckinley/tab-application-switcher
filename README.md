@@ -12,7 +12,6 @@ It's like your system's Application Switcher, but for your Chrome tabs:
 Additional features to help you find and access your tabs:
 
 - Tabs can be searched by url and page title.
-- Access your tabs in the chrome omnibox by typing 'tas' then `tab`.
 - Display appears in your current active window when using the keyboard shortcut. It is also available as an extension action in the chrome menu area.
 
 Default keyboard shortcuts:
@@ -46,7 +45,7 @@ Limitations:
 - Keyboard shortcuts will not activate TAS on the Chrome Web Store, on New Tab pages, or on other settings-like pages (urls starting with chrome://).
   Click the extension icon to activate TAS in these situations.
 - It is possible that other extensions or system preferences can conflict with TAS keyboard shortcuts.
-  The Options panel can be used to change TAS keyboard shortcuts. Further management can be done here: chrome://extensions/shortcuts
+  The Options panel can be used to change TAS keyboard shortcuts.
 
 ## Development
 
@@ -225,8 +224,9 @@ Instead of using event emitters or pub/sub patterns, we use coordinator classes 
 **Background Scripts** (`app/scripts/background.ts`):
 
 - **BackgroundCoordinator**: Orchestrates background services
-  - Manages: `Tabs`, `Omnibox`
-  - Handles: Cross-component communication
+  - Manages: `Tabs`, `Connection`
+  - Handles: Tab state management and content script injection
+- **Tabs**: Maintains MRU-ordered tab cache and handles tab selection
 - **Connection**: Manages content script injection and reconnection on extension reload
 
 **Popup/Options** (`app/scripts/popup.ts`, `app/scripts/options.ts`):

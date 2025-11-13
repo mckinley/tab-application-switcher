@@ -33,9 +33,6 @@
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
-  "omnibox": {
-    "keyword": "tas"
-  },
   "action": {
     "default_icon": {
       "19": "images/icon-19.png",
@@ -49,12 +46,6 @@
       "suggested_key": {
         "default": "Alt+Z"
       }
-    },
-    "activate": {
-      "suggested_key": {
-        "default": "Alt+Tab"
-      },
-      "description": "Activate Tab Application Switcher"
     }
   }
 }

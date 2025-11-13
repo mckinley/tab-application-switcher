@@ -2,19 +2,7 @@
  * Shared type definitions for the Tab Application Switcher extension
  */
 
-/**
- * Extended Chrome tab with additional properties
- * We omit certain fields from chrome.tabs.Tab to make them optional in our usage
- */
-export interface Tab extends Omit<chrome.tabs.Tab, 'index' | 'windowId' | 'id' | 'active' | 'title' | 'url'> {
-  favIconUrl?: string
-  title?: string
-  url?: string
-  id?: number
-  windowId?: number
-  active?: boolean
-  index?: number
-}
+export type Tab = chrome.tabs.Tab
 
 /**
  * Message types for Chrome runtime messaging
@@ -86,5 +74,5 @@ export interface ICoordinator {
  * Background coordinator interface
  */
 export interface IBackgroundCoordinator {
-  handleOmniboxSelectTab(tab: Tab): void
+  tabs: { tabs: Tab[] }
 }

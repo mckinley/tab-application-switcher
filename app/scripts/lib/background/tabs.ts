@@ -1,5 +1,4 @@
-import { isRestrictedChromeUrl } from '../utils.js'
-import type { Tab, IBackgroundCoordinator } from '../types.js'
+import type { Tab, IBackgroundCoordinator, RuntimeMessage, RuntimeResponse } from '../types.js'
 
 export default class Tabs {
   coordinator: IBackgroundCoordinator
@@ -9,43 +8,26 @@ export default class Tabs {
     this.coordinator = coordinator
     this.tabs = []
 
-    chrome.commands.onCommand.addListener((command) => {
-      if (command === 'activate') {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const tab = tabs[0]
-          if (!tab) return
+    chrome.runtime.onMessage.addListener(
+      (
+        request: RuntimeMessage,
+        _sender: chrome.runtime.MessageSender,
+        sendResponse: (response: RuntimeResponse) => void
+      ) => {
+        // Handle tab list request
+        if ('tabs' in request && request.tabs) {
+          sendResponse({ tabs: this.tabs })
+          return
+        }
 
-          // Check if the tab URL is a restricted Chrome page
-          if (isRestrictedChromeUrl(tab.url)) {
-            // Cannot inject content scripts into Chrome internal pages
-            console.log('[TAS] Cannot activate on restricted page:', tab.url)
-            return
-          }
-
-          if (!tab.id) return
-
-          void chrome.tabs.sendMessage(tab.id, { action: 'activate' }).catch((error) => {
-            // Content script might not be injected yet or page doesn't allow it
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            if (errorMessage.includes('Receiving end does not exist')) {
-              console.log('[TAS] Content script not available on tab:', tab.url)
-            } else {
-              console.error('[TAS] Failed to send activate message:', error)
-            }
-          })
-        })
+        // Handle tab selection request
+        if ('selectTab' in request) {
+          this.selectTab(request.selectTab as Tab)
+        }
       }
-    })
+    )
 
-    chrome.runtime.onMessage.addListener((request: unknown, _sender, sendResponse) => {
-      if (typeof request === 'object' && request !== null && 'tabs' in request && request.tabs) {
-        sendResponse({ tabs: this.tabs })
-      } else if (typeof request === 'object' && request !== null && 'selectTab' in request) {
-        this.selectTab(request.selectTab as Tab)
-      }
-    })
-
-    // TODO: Test if this is redundant with chrome.tabs.onActivated (line 71)
+    // TODO: Test if this is redundant with chrome.tabs.onActivated
     // Both might fire when switching windows, potentially calling unshiftTab twice
     chrome.windows.onFocusChanged.addListener(() => {
       chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {

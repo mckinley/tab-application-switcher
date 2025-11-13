@@ -13,9 +13,11 @@ export default class PopupCoordinator {
     this.keyboard = new Keyboard(this)
     this.display = new Display(this, mainCss)
 
-    // Activate keyboard and display immediately
-    this.keyboard.activate()
-    void this.display.activate()
+    // Wait for keyboard to be ready before activating
+    this.keyboard.onReady = () => {
+      this.keyboard.activate()
+      void this.display.activate()
+    }
   }
 
   // ============================================
