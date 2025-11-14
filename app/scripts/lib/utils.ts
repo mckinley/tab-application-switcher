@@ -16,34 +16,10 @@ export function escapeHtml(text: string | null | undefined): string {
 }
 
 /**
- * Check if a favicon URL is valid and safe to load
- * Filters out URLs that will fail to load or cause CORS errors
+ * Check if content scripts can be injected into a URL
+ * Returns true if the URL matches our content script patterns
  */
-export function isValidFaviconUrl(url: string | undefined): boolean {
+export function canInjectContentScript(url: string | undefined): boolean {
   if (!url) return false
-
-  return (
-    !url.startsWith('chrome://') &&
-    !url.startsWith('http://localhost') &&
-    !url.startsWith('https://localhost') &&
-    !url.startsWith('http://127.0.0.1') &&
-    !url.startsWith('https://127.0.0.1') &&
-    !url.startsWith('file://')
-  )
-}
-
-/**
- * Check if a URL is a restricted Chrome internal page
- * Content scripts cannot be injected into these pages
- */
-export function isRestrictedChromeUrl(url: string | undefined): boolean {
-  if (!url) return true
-
-  return (
-    url.startsWith('chrome://') ||
-    url.startsWith('chrome-extension://') ||
-    url.startsWith('edge://') ||
-    url.startsWith('about:') ||
-    url.includes('chrome.google.com/webstore')
-  )
+  return url.startsWith('http://') || url.startsWith('https://')
 }

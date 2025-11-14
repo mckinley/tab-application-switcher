@@ -54,6 +54,24 @@ export default class Coordinator implements ICoordinator {
       return false
     }
 
+    // Overlay activation from background script (Alt+Z)
+    if ('activateOverlay' in request && request.activateOverlay) {
+      this.handleActivate()
+      return false
+    }
+
+    // Activate or next from background script (Alt+X)
+    if ('activateOrNext' in request && request.activateOrNext) {
+      if (this.keyboard.active) {
+        // Overlay is open, move to next tab
+        this.handleNext()
+      } else {
+        // Overlay is closed, activate it
+        this.handleActivate()
+      }
+      return false
+    }
+
     return false
   }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { escapeHtml } from '../../../app/scripts/lib/utils.js'
+import { escapeHtml, canInjectContentScript } from '../../../app/scripts/lib/utils.js'
 
 describe('escapeHtml', () => {
   it('escapes script tags to prevent XSS', () => {
@@ -35,6 +35,40 @@ describe('escapeHtml', () => {
     const escaped = escapeHtml(tabTitle)
     expect(escaped).not.toContain('<img')
     expect(escaped).toContain('&lt;img')
+  })
+})
+
+describe('canInjectContentScript', () => {
+  it('allows http URLs', () => {
+    expect(canInjectContentScript('http://example.com')).toBe(true)
+    expect(canInjectContentScript('http://localhost:3000')).toBe(true)
+  })
+
+  it('allows https URLs', () => {
+    expect(canInjectContentScript('https://example.com')).toBe(true)
+    expect(canInjectContentScript('https://google.com/search')).toBe(true)
+  })
+
+  it('blocks chrome:// URLs', () => {
+    expect(canInjectContentScript('chrome://extensions')).toBe(false)
+    expect(canInjectContentScript('chrome://settings')).toBe(false)
+  })
+
+  it('blocks chrome-extension:// URLs', () => {
+    expect(canInjectContentScript('chrome-extension://abc123/popup.html')).toBe(false)
+  })
+
+  it('blocks edge:// URLs', () => {
+    expect(canInjectContentScript('edge://settings')).toBe(false)
+  })
+
+  it('blocks about: URLs', () => {
+    expect(canInjectContentScript('about:blank')).toBe(false)
+  })
+
+  it('blocks undefined and empty URLs', () => {
+    expect(canInjectContentScript(undefined)).toBe(false)
+    expect(canInjectContentScript('')).toBe(false)
   })
 })
 

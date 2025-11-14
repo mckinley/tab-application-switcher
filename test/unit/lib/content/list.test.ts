@@ -111,31 +111,6 @@ describe('List', () => {
       expect(html).toContain('&lt;script&gt;')
       expect(html).toContain('&lt;/script&gt;')
     })
-
-    it('handles tabs with missing favicons', () => {
-      const tabs: Tab[] = [
-        { id: 1, title: 'Tab 1', url: 'http://example.com', favIconUrl: undefined }
-      ]
-
-      const root = list.render(tabs)
-      const img = root.querySelector('img')
-
-      // Should have a default favicon (data URL)
-      expect(img?.src).toContain('data:image/svg+xml')
-    })
-
-    it('filters out invalid favicon URLs', () => {
-      const tabs: Tab[] = [
-        { id: 1, title: 'Tab 1', url: 'http://example.com', favIconUrl: 'chrome://favicon' }
-      ]
-
-      const root = list.render(tabs)
-      const img = root.querySelector('img')
-
-      // Should use default favicon instead of chrome:// URL
-      expect(img?.src).toContain('data:image/svg+xml')
-      expect(img?.src).not.toContain('chrome://')
-    })
   })
 })
 

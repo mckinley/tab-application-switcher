@@ -51,6 +51,12 @@ export default class Keyboard {
       return false
     })
 
+    // Also bind Alt+X for next (from manifest command)
+    this.keyBinder.bind(this.keys.modifier + '+x', () => {
+      this.coordinator.handleNext()
+      return false
+    })
+
     this.bindKeyset(this.keys.previous, () => {
       this.coordinator.handlePrevious()
       return false
@@ -84,6 +90,7 @@ export default class Keyboard {
     if (!this.active) return
 
     this.unbindKeyset(this.keys.next)
+    this.keyBinder.unbind(this.keys.modifier + '+x')
     this.unbindKeyset(this.keys.previous)
     this.unbindKeyset(this.keys.select)
     this.unbindKeyset(this.keys.cancel)

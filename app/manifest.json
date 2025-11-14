@@ -46,6 +46,12 @@
       "suggested_key": {
         "default": "Alt+Z"
       }
+    },
+    "activate-overlay": {
+      "suggested_key": {
+        "default": "Alt+X"
+      },
+      "description": "Activate the tab switcher overlay"
     }
   }
 }

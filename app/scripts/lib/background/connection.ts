@@ -1,4 +1,4 @@
-import { isRestrictedChromeUrl } from '../utils.js'
+import { canInjectContentScript } from '../utils.js'
 
 interface Manifest {
   content_scripts?: Array<{
@@ -35,8 +35,8 @@ export default class Connection {
       const tabs = await chrome.tabs.query({})
 
       for (const tab of tabs) {
-        // Skip restricted Chrome pages where content scripts cannot be injected
-        if (isRestrictedChromeUrl(tab.url)) {
+        // Skip tabs where content scripts cannot be injected
+        if (!canInjectContentScript(tab.url)) {
           continue
         }
 

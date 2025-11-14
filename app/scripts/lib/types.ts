@@ -34,7 +34,21 @@ export interface SelectTabMessage {
   }
 }
 
-export type RuntimeMessage = PingMessage | ActivateMessage | TabsRequestMessage | SelectTabMessage
+export interface ActivateOverlayMessage {
+  activateOverlay: true
+}
+
+export interface ActivateOrNextMessage {
+  activateOrNext: true
+}
+
+export type RuntimeMessage =
+  | PingMessage
+  | ActivateMessage
+  | TabsRequestMessage
+  | SelectTabMessage
+  | ActivateOverlayMessage
+  | ActivateOrNextMessage
 
 export type RuntimeResponse = PongResponse | TabsResponseMessage | void
 
